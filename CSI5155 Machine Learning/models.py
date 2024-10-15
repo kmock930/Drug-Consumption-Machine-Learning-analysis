@@ -122,7 +122,7 @@ class Models:
     def train(self, model: DecisionTreeClassifier | RandomForestClassifier | SVC | GradientBoostingClassifier | MLPClassifier | KNeighborsClassifier = None):
         try:
             if not model:
-                print('Training all models')
+                print('Training all models');
                 self.decisionTree_clf.fit(self.X_train, self.y_train);
                 self.randomForest_clf.fit(self.X_train, self.y_train);
                 self.svm_clf.fit(self.X_train, self.y_train);
@@ -136,7 +136,9 @@ class Models:
             # save all trained models
             self.saveModels(isTrained=True, dataset=constants.choco_dataset); 
         except:
+            print("Failed to train a model.");
             return False;
+        print("All models are completely trained.");
         return True;
 
     def saveModels(self, isTrained=False, dataset=constants.choco_dataset, **args):

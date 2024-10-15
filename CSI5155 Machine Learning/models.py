@@ -8,6 +8,8 @@ from sklearn.preprocessing import StandardScaler;
 from sklearn.preprocessing import LabelEncoder;
 import joblib;
 import constants;
+import traceback;
+import sys;
 
 '''
 @summary A class which encapsulates various models which have been initialized
@@ -27,50 +29,68 @@ class Models:
     X_test: np.ndarray;
     y_test: np.ndarray;
 
-    def __init__(self):
-        self.decisionTree_clf = DecisionTreeClassifier(
-            criterion=constants.tree_entropyCriterion,
-            splitter=constants.splitter,
-            max_depth=None
-        );
-    
-        self.randomForest_clf = RandomForestClassifier(
-            criterion=constants.tree_entropyCriterion,
-            bootstrap=True # the dataset is split into different trees
-        );
-    
-        self.svm_clf = SVC(
-            C=1.0,
-            kernel=constants.svc_kernel,
-            degree=3, # Degree of the polynomial kernel function
-            gamma=constants.svc_gamma
-        );
-    
-        self.gradientBoost_clf = GradientBoostingClassifier(
-            loss=constants.gradient_Loss, # Gradient Boost algorithm
-            learning_rate=constants.gradient_LearningRate,
-            n_estimators=constants.gradient_estimators, # number of boosting stages to perform
-            subsample=constants.gradient_subsamples, # fraction of samples to be used for fitting the individual base learners
-            criterion=constants.gradient_criterion
-        );
-    
-        self.mlp_clf = MLPClassifier(
-            hidden_layer_sizes=constants.mlp_hidden_layer_size,
-            activation=constants.mlp_activation, # Activation function
-            solver=constants.mlp_solver, # weight optimization
-            alpha=constants.mlp_alpha, # Strength of the L2 regularization
-            learning_rate=constants.mlp_LearningRate,
-            shuffle=True # shuffle samples in each iteration
-        );
+    def __init__(self, decisionTree_clf:DecisionTreeClassifier=None, randomForest_clf:RandomForestClassifier=None, svm_clf:SVC=None, gradientBoost_clf:GradientBoostingClassifier=None, mlp_clf:MLPClassifier=None, knn_clf:KNeighborsClassifier=None):
+        if (decisionTree_clf == None):
+            self.decisionTree_clf = DecisionTreeClassifier(
+                criterion=constants.tree_entropyCriterion,
+                splitter=constants.splitter,
+                max_depth=None
+            );
+        else:
+            self.decisionTree_clf = decisionTree_clf;
 
-        self.knn_clf = KNeighborsClassifier(
-            n_neighbors=constants.knn_neighbors,
-            weights=constants.knn_weights, # Weight function used in prediction
-            algorithm=constants.knn_algorithm,
-            p=constants.knn_distMetric,
-            metric=constants.knn_metric,
-            n_jobs=constants.knn_jobs
-        );
+        if (randomForest_clf == None):
+            self.randomForest_clf = RandomForestClassifier(
+                criterion=constants.tree_entropyCriterion,
+                bootstrap=True # the dataset is split into different trees
+            );
+        else:
+            self.randomForest_clf = randomForest_clf;
+
+        if (svm_clf == None):
+            self.svm_clf = SVC(
+                C=1.0,
+                kernel=constants.svc_kernel,
+                degree=3, # Degree of the polynomial kernel function
+                gamma=constants.svc_gamma
+            );
+        else:
+            self.svm_clf = svm_clf;
+
+        if (gradientBoost_clf == None):
+            self.gradientBoost_clf = GradientBoostingClassifier(
+                loss=constants.gradient_Loss, # Gradient Boost algorithm
+                learning_rate=constants.gradient_LearningRate,
+                n_estimators=constants.gradient_estimators, # number of boosting stages to perform
+                subsample=constants.gradient_subsamples, # fraction of samples to be used for fitting the individual base learners
+                criterion=constants.gradient_criterion
+            );
+        else:
+            self.gradientBoost_clf = gradientBoost_clf;
+
+        if (mlp_clf == None):
+            self.mlp_clf = MLPClassifier(
+                hidden_layer_sizes=constants.mlp_hidden_layer_size,
+                activation=constants.mlp_activation, # Activation function
+                solver=constants.mlp_solver, # weight optimization
+                alpha=constants.mlp_alpha, # Strength of the L2 regularization
+                learning_rate=constants.mlp_LearningRate,
+                shuffle=True # shuffle samples in each iteration
+            );
+        else:
+            self.mlp_clf = mlp_clf;
+    
+        if (knn_clf == None):
+            self.knn_clf = KNeighborsClassifier(
+                n_neighbors=constants.knn_neighbors,
+                weights=constants.knn_weights, # Weight function used in prediction
+                algorithm=constants.knn_algorithm,
+                p=constants.knn_distMetric,
+                metric=constants.knn_metric,
+                n_jobs=constants.knn_jobs
+            );
+        else:
+            self.knn_clf = knn_clf;
 
     '''
     @param args: pass as many string as possible to specify which model to output
@@ -121,6 +141,8 @@ class Models:
     
     def train(self, model: DecisionTreeClassifier | RandomForestClassifier | SVC | GradientBoostingClassifier | MLPClassifier | KNeighborsClassifier = None):
         try:
+            exc_info = sys.exc_info();
+
             if not model:
                 print('Training all models');
                 self.decisionTree_clf.fit(self.X_train, self.y_train);
@@ -137,6 +159,7 @@ class Models:
             self.saveModels(isTrained=True, dataset=constants.choco_dataset); 
         except:
             print("Failed to train a model.");
+            traceback.print_exc();
             return False;
         print("All models are completely trained.");
         return True;

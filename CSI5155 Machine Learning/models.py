@@ -75,6 +75,7 @@ class Models:
                 solver=constants.mlp_solver, # weight optimization
                 alpha=constants.mlp_alpha, # Strength of the L2 regularization
                 learning_rate=constants.mlp_LearningRate,
+                max_iter=constants.mlp_maxItr,
                 shuffle=True # shuffle samples in each iteration
             );
         else:

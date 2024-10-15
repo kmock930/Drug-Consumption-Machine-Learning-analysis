@@ -188,5 +188,6 @@ class Models:
             if (args== {} or constants.knn in args):
                 joblib.dump(self.knn_clf, dataset + '_model_KNN' + isTrained_string + '.pkl');
         except:
+            traceback.print_exc();
             return False;
         return True;

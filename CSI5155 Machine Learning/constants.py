@@ -2,6 +2,7 @@ entropyCriterion = "entropy";
 splitter="random";
 descisionTree="decision tree";
 randForest="random forest";
+svm="SVM";
 column_names_orig = [
     "ID",
     "age",

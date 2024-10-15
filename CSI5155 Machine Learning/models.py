@@ -1,7 +1,7 @@
 import numpy as np;
 from sklearn.tree import DecisionTreeClassifier;
 from sklearn.ensemble import RandomForestClassifier;
-from sklearn import svm;
+from sklearn.svm import SVC;
 import joblib;
 import constants;
 
@@ -27,6 +27,14 @@ class Models:
             bootstrap=True, # the dataset is split into different trees
             random_state=np.random.RandomState
         );
+    
+        self.svm_clf = SVC(
+            C=1.0,
+            kernel='rbf', # the data is obviously non-linear, hence we use SVC with RBF kernel
+            degree=3,
+            gamma='scale', # uses 1 / (n_features * X.var())
+            random_state=np.random.RandomState
+        )
 
     '''
     @param args: pass as many string as possible to specify which model to output
@@ -40,6 +48,8 @@ class Models:
             res.update({constants.descisionTree: self.decisionTree_clf});
         if (args == {} or constants.randForest in args):
             res.update({constants.randForest: self.randomForest_clf});
+        if (args == {} or constants.svm in args):
+            res.update({constants.svm: self.svm_clf});
         
         return res
 
@@ -57,6 +67,8 @@ class Models:
                 joblib.dump(self.decisionTree_clf, 'model_decisionTree' + isTrained_string + '.pkl');
             if (args == {} or constants.randForest in args):
                 joblib.dump(self.randomForest_clf, 'model_randomForest' + isTrained_string + '.pkl');
+            if (args == {} or constants.svm in args):
+                joblib.dump(self.svm_clf, 'model_SVC_RBF' + isTrained_string + '.pkl');
         except:
             return False;
         return True;

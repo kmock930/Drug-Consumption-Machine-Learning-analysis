@@ -1,7 +1,11 @@
 import numpy as np;
 from sklearn.tree import DecisionTreeClassifier;
-from sklearn.ensemble import RandomForestClassifier;
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier;
 from sklearn.svm import SVC;
+from sklearn.neural_network import MLPClassifier;
+from sklearn.neighbors import KNeighborsClassifier;
+from sklearn.preprocessing import StandardScaler;
+from sklearn.preprocessing import LabelEncoder;
 import joblib;
 import constants;
 
@@ -10,37 +14,73 @@ import constants;
 '''
 class Models:
     # classifiers
-    decisionTree_clf = None;
-    randomForest_clf = None;
-    svm_clf = None;
+    decisionTree_clf:DecisionTreeClassifier;
+    randomForest_clf:RandomForestClassifier;
+    svm_clf:SVC;
+    gradientBoost_clf:GradientBoostingClassifier;
+    mlp_clf:MLPClassifier;
+    knn_clf:KNeighborsClassifier;
+
+    # data
+    X_train: np.ndarray;
+    y_train: np.ndarray;
+    X_test: np.ndarray;
+    y_test: np.ndarray;
 
     def __init__(self):
         self.decisionTree_clf = DecisionTreeClassifier(
-            criterion=constants.entropyCriterion,
+            criterion=constants.tree_entropyCriterion,
             splitter=constants.splitter,
-            max_depth=None,
-            random_state=np.random.RandomState
+            max_depth=None
         );
     
         self.randomForest_clf = RandomForestClassifier(
-            criterion=constants.entropyCriterion,
-            bootstrap=True, # the dataset is split into different trees
-            random_state=np.random.RandomState
+            criterion=constants.tree_entropyCriterion,
+            bootstrap=True # the dataset is split into different trees
         );
     
         self.svm_clf = SVC(
             C=1.0,
-            kernel='rbf', # the data is obviously non-linear, hence we use SVC with RBF kernel
-            degree=3,
-            gamma='scale', # uses 1 / (n_features * X.var())
-            random_state=np.random.RandomState
-        )
+            kernel=constants.svc_kernel,
+            degree=3, # Degree of the polynomial kernel function
+            gamma=constants.svc_gamma
+        );
+    
+        self.gradientBoost_clf = GradientBoostingClassifier(
+            loss=constants.gradient_Loss, # Gradient Boost algorithm
+            learning_rate=constants.gradient_LearningRate,
+            n_estimators=constants.gradient_estimators, # number of boosting stages to perform
+            subsample=constants.gradient_subsamples, # fraction of samples to be used for fitting the individual base learners
+            criterion=constants.gradient_criterion
+        );
+    
+        self.mlp_clf = MLPClassifier(
+            hidden_layer_sizes=constants.mlp_hidden_layer_size,
+            activation=constants.mlp_activation, # Activation function
+            solver=constants.mlp_solver, # weight optimization
+            alpha=constants.mlp_alpha, # Strength of the L2 regularization
+            learning_rate=constants.mlp_LearningRate,
+            shuffle=True # shuffle samples in each iteration
+        );
+
+        self.knn_clf = KNeighborsClassifier(
+            n_neighbors=constants.knn_neighbors,
+            weights=constants.knn_weights, # Weight function used in prediction
+            algorithm=constants.knn_algorithm,
+            p=constants.knn_distMetric,
+            metric=constants.knn_metric,
+            n_jobs=constants.knn_jobs
+        );
 
     '''
     @param args: pass as many string as possible to specify which model to output
     Possible models:
     - 'decision tree'
     - 'random forest'
+    - 'SVM'
+    - 'gradient boosting'
+    - 'multi-layer perceptron (MLP)'
+    - 'k‐nearest neighbour (k-NN) classifier'
     '''
     def getModels(self, *args):
         res = {};
@@ -50,10 +90,56 @@ class Models:
             res.update({constants.randForest: self.randomForest_clf});
         if (args == {} or constants.svm in args):
             res.update({constants.svm: self.svm_clf});
-        
-        return res
+        if (args == {} or constants.gradientBoost in args):
+            res.update({constants.gradientBoost: self.gradientBoost_clf});
+        if (args == {} or constants.mlp in args):
+            res.update({constants.mlp: self.mlp_clf});
+        if (args == {} or constants.knn in args):
+            res.update({constants.knn: self.knn_clf});
+               
+        return res;
 
-    def saveModels(self, isTrained=False, **args):
+    def set_X_train(self, X:np.ndarray):
+        self.X_train = X;
+    
+    def set_y_train(self, y:np.ndarray):
+        self.y_train = y;
+    
+    def set_X_test(self, X: np.ndarray):
+        self.X_test = X;
+    
+    def set_y_test(self, y: np.ndarray):
+        self.y_test = y;
+    
+    def normalize(self):
+        scaler = StandardScaler(); # uses the z-score to calibrate
+        le = LabelEncoder(); # convert categorical labels into numeric representation
+        self.X_train = scaler.fit_transform(self.X_train);
+        self.X_test = scaler.fit_transform(self.X_test);
+        self.y_train = le.fit_transform(self.y_train);
+        self.y_test = le.fit_transform(self.y_test);
+    
+    def train(self, model: DecisionTreeClassifier | RandomForestClassifier | SVC | GradientBoostingClassifier | MLPClassifier | KNeighborsClassifier = None):
+        try:
+            if not model:
+                print('Training all models')
+                self.decisionTree_clf.fit(self.X_train, self.y_train);
+                self.randomForest_clf.fit(self.X_train, self.y_train);
+                self.svm_clf.fit(self.X_train, self.y_train);
+                self.gradientBoost_clf.fit(self.X_train, self.y_train);
+                self.mlp_clf.fit(self.X_train, self.y_train);
+                self.knn_clf.fit(self.X_train, self.y_train);
+            else:
+                print('Training the specific model')
+                model.fit(self.X_train, self.y_train);
+
+            # save all trained models
+            self.saveModels(isTrained=True, dataset=constants.choco_dataset); 
+        except:
+            return False;
+        return True;
+
+    def saveModels(self, isTrained=False, dataset=constants.choco_dataset, **args):
         try:
             # format part of the filename
             # by deciding whether the saved model file is trained or untrained
@@ -63,12 +149,18 @@ class Models:
             else:
                 isTrained_string = '_pretrained';
             
-            if (args == {} or constants.descisionTree in args):
-                joblib.dump(self.decisionTree_clf, 'model_decisionTree' + isTrained_string + '.pkl');
-            if (args == {} or constants.randForest in args):
-                joblib.dump(self.randomForest_clf, 'model_randomForest' + isTrained_string + '.pkl');
-            if (args == {} or constants.svm in args):
-                joblib.dump(self.svm_clf, 'model_SVC_RBF' + isTrained_string + '.pkl');
+            if (args== {} or constants.descisionTree in args):
+                joblib.dump(self.decisionTree_clf, dataset + '_model_decisionTree' + isTrained_string + '.pkl');
+            if (args== {} or constants.randForest in args):
+                joblib.dump(self.randomForest_clf, dataset + '_model_randomForest' + isTrained_string + '.pkl');
+            if (args== {} or constants.svm in args):
+                joblib.dump(self.svm_clf, dataset + '_model_SVC_RBF' + isTrained_string + '.pkl');
+            if (args== {} or constants.gradientBoost in args):
+                joblib.dump(self.svm_clf, dataset + '_model_Gradient_Boosting' + isTrained_string + '.pkl');
+            if (args== {} or constants.mlp in args):
+                joblib.dump(self.mlp_clf, dataset + '_model_MLP' + isTrained_string + '.pkl');
+            if (args== {} or constants.knn in args):
+                joblib.dump(self.knn_clf, dataset + '_model_KNN' + isTrained_string + '.pkl');
         except:
             return False;
         return True;

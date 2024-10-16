@@ -140,7 +140,7 @@ class Models:
         self.y_train = le.fit_transform(self.y_train);
         self.y_test = le.fit_transform(self.y_test);
     
-    def train(self, model: DecisionTreeClassifier | RandomForestClassifier | SVC | GradientBoostingClassifier | MLPClassifier | KNeighborsClassifier = None):
+    def train(self, model: DecisionTreeClassifier | RandomForestClassifier | SVC | GradientBoostingClassifier | MLPClassifier | KNeighborsClassifier = None, dataset=constants.choco_dataset):
         try:
             exc_info = sys.exc_info();
 
@@ -157,7 +157,7 @@ class Models:
                 model.fit(self.X_train, self.y_train);
 
             # save all trained models
-            self.saveModels(isTrained=True, dataset=constants.choco_dataset); 
+            self.saveModels(isTrained=True, dataset=dataset); 
         except:
             print("Failed to train a model.");
             traceback.print_exc();
@@ -170,7 +170,7 @@ class Models:
             # format part of the filename
             # by deciding whether the saved model file is trained or untrained
             isTrained_string = "";
-            if (isTrained):
+            if (isTrained == True):
                 isTrained_string = '_posttrained';
             else:
                 isTrained_string = '_pretrained';

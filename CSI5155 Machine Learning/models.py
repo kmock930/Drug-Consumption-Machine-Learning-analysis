@@ -182,7 +182,7 @@ class Models:
             if (args== {} or constants.svm in args):
                 joblib.dump(self.svm_clf, dataset + '_model_SVC_RBF' + isTrained_string + '.pkl');
             if (args== {} or constants.gradientBoost in args):
-                joblib.dump(self.svm_clf, dataset + '_model_Gradient_Boosting' + isTrained_string + '.pkl');
+                joblib.dump(self.gradientBoost_clf, dataset + '_model_Gradient_Boosting' + isTrained_string + '.pkl');
             if (args== {} or constants.mlp in args):
                 joblib.dump(self.mlp_clf, dataset + '_model_MLP' + isTrained_string + '.pkl');
             if (args== {} or constants.knn in args):

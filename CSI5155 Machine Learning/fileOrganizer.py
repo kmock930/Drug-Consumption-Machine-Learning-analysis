@@ -4,7 +4,16 @@ move specific .pkl model files into proper directories.
 '''
 import os;
 import shutil;
+import pickle;
 import constants;
+
+import os;
+import joblib;
+import traceback;
+
+def unpack(filepath):
+    with open(filepath, 'rb') as file:
+        return joblib.load(file);
 
 def organize():
     # Define the root directory where the model files are located

@@ -214,8 +214,23 @@ class Models:
 
     # random search approach
     def paramTuning(model: DecisionTreeClassifier | RandomForestClassifier | SVC | GradientBoostingClassifier | MLPClassifier | KNeighborsClassifier = None):
-        return RandomizedSearchCV(
-            estimator=model,
-            param_distributions=constants.randomSearch_distributions,
-            random_state=constants.random_state
-        );
+        if (isinstance(model, SVC)):
+            # params suitable for this kernel based model
+            return RandomizedSearchCV(
+                estimator=model,
+                param_distributions=constants.randomSearch_distributions_distributions_SVC,
+                random_state=constants.random_state
+            );
+        elif (isinstance(model, KNeighborsClassifier)):
+            # parameters for this non-parametric model (neither kernel based nor tree based)
+            return RandomizedSearchCV(
+                estimator=model,
+                param_distributions=constants.randomSearch_distributions_distributions_KNN,
+                random_state=constants.random_state
+            );
+        else:
+            return RandomizedSearchCV(
+                estimator=model,
+                param_distributions=constants.randomSearch_distributions,
+                random_state=constants.random_state
+            );

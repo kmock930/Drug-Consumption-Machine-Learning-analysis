@@ -1,6 +1,5 @@
 import random;
-import scipy;
-from scipy.stats import uniform, norm;
+from scipy.stats import randint, uniform;
 
 tree_entropyCriterion = "entropy";
 splitter="random";
@@ -109,8 +108,20 @@ filepaths = {
     'mushrooms_train-set_samples': ".\mushrooms\Training Set\mushrooms_train-set_samples.pkl",
 };
 randomSearch_distributions={
-    "C": uniform(loc=0, scale=4),
-    "penalty": ['l2', 'l1'],
-    "rvs": norm().rvs
+    'max_depth': randint(1, 20).rvs(size=100),
+    'min_samples_split': uniform(0.1, 0.9)
 };
+randomSearch_distributions_distributions_SVC={
+    'C': uniform(0.1, 10),  # Regularization parameter
+    'kernel': ['linear', 'poly', 'rbf', 'sigmoid'],  # Kernel types
+    'gamma': ['scale', 'auto'] + list(uniform(0.01, 0.1).rvs(size=5)),  # Gamma for rbf/poly kernels
+    'degree': randint(2, 5)  # Only for polynomial kernels
+};
+randomSearch_distributions_distributions_KNN={
+    'n_neighbors': randint(1, 30),  # Number of neighbors to use
+    'weights': ['uniform', 'distance'],  # Weight function
+    'algorithm': ['auto', 'ball_tree', 'kd_tree', 'brute'],  # Algorithm used to compute the nearest neighbors
+    'leaf_size': randint(1, 50),  # Leaf size for BallTree or KDTree
+    'metric': ['euclidean', 'manhattan', 'minkowski']  # Distance metric
+}
 random_state=42;

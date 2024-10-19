@@ -2,6 +2,13 @@ import pandas as pd;
 import numpy as np;
 import matplotlib.pyplot as plt;
 import sklearn.metrics as metrics;
+from sklearn.metrics import roc_curve;
+import constants;
+from sklearn.tree import DecisionTreeClassifier;
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier;
+from sklearn.svm import SVC;
+from sklearn.neural_network import MLPClassifier;
+from sklearn.neighbors import KNeighborsClassifier;
 
 '''
 @summary Function that evaluates number of True Positives
@@ -144,20 +151,38 @@ def evalPredictionNum(y_pred: np.ndarray, y_test: np.ndarray, truePred: bool = N
     else:
         return len(evalArray[evalArray == truePred]);
 
-def plotROC(fpr, tpr, y_test, y_prob_scores):
-    # https://stackoverflow.com/questions/25009284/how-to-plot-roc-curve-in-python
-    plt.title('Receiver Operating Characteristic (ROC) Curve');
-    plt.plot(fpr, tpr, color='blue', label = 'AUC = %0.2f' % getAUC(y_test=y_test, y_prob_scores=y_prob_scores));
+def plotROC(models: dict, X_test: np.ndarray, y_test: np.ndarray | list, dataset: str):
+    plt.figure(figsize=(10, 8));
+    # https://scikit-learn.org/1.0/modules/generated/sklearn.metrics.plot_roc_curve.html
+    plt.title(f'Receiver Operating Characteristic (ROC) Curve for {dataset} dataset');
+
+    # iterate through those 6 models
+    if (len(models) > 0):
+        for modelName in models:
+            model = models[modelName];
+            y_scores = getYScore(model, X_test);
+            fpr, tpr, _ = roc_curve(y_test, y_scores);
+            auc = getAUC(y_test, y_scores);
+            plt.plot(fpr, tpr, label=f'{modelName} (AUC = {auc:.2f})');
+
+    
     plt.legend(loc = 'lower right');
-    plt.plot([0, 1], [0, 1], color='red', linestyle='--');
-    plt.xlim([0.0, 1.0]);
-    plt.ylim([0.0, 1.05]);
+    plt.plot([0, 1], [0, 1],'r--');
+    plt.xlim([0, 1]);
+    plt.ylim([0, 1]);
     plt.ylabel('True Positive Rate');
     plt.xlabel('False Positive Rate');
-    plt.legend(loc='lower right');
-    plt.grid();
     plt.show();
 
 def getAUC(y_test, y_prob_scores):
     return metrics.roc_auc_score(y_test, y_prob_scores)
 
+def getYScore(model, X_test: np.ndarray):
+    # Get predicted probabilities (for classifiers like SVM, set probability=True)
+    if hasattr(model, "predict_proba"):
+        # Get probabilities for the positive class
+        y_scores = model.predict_proba(X_test)[:, 1];
+    else:
+        # Use decision function for models like SVM without predict_proba
+        y_scores = model.decision_function(X_test);
+    return y_scores;

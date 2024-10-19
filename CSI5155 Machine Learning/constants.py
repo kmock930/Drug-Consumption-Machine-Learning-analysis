@@ -63,6 +63,7 @@ column_names_orig = [
     "vsa" 
 ];
 choco_dataset="choc";
+choco_dataset_fullname="chocolate";
 mushrooms_dataset="mushrooms";
 # filepaths
 filepaths = {

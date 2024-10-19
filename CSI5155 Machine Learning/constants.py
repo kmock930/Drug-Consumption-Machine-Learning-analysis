@@ -1,4 +1,7 @@
 import random;
+import scipy;
+from scipy.stats import uniform, norm;
+
 tree_entropyCriterion = "entropy";
 splitter="random";
 descisionTree="decision tree";
@@ -104,4 +107,9 @@ filepaths = {
     # mushrooms training set
     "mushrooms_train-set_labels": ".\mushrooms\Training Set\mushrooms_train-set_labels.pkl",
     'mushrooms_train-set_samples': ".\mushrooms\Training Set\mushrooms_train-set_samples.pkl",
-}
+};
+randomSearch_distributions={
+    "C": uniform(loc=0, scale=4),
+    "penalty": ['l2', 'l1'],
+    "rvs": norm().rvs
+};

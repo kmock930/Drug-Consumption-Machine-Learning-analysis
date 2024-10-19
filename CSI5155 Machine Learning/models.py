@@ -6,6 +6,7 @@ from sklearn.neural_network import MLPClassifier;
 from sklearn.neighbors import KNeighborsClassifier;
 from sklearn.preprocessing import StandardScaler;
 from sklearn.preprocessing import LabelEncoder;
+from sklearn.model_selection import RandomizedSearchCV;
 import joblib;
 import constants;
 import traceback;
@@ -132,6 +133,25 @@ class Models:
     def set_y_test(self, y: np.ndarray):
         self.y_test = y;
     
+    '''
+    @summary A function that returns the prediction results in a boolean matrix.
+    @param model - one of the 6 designated classifiers
+    @param X_test: numpy array - a sample array for preddiction
+    @param y_test: numpy array - an array of actual labels for evaluating the prediction
+    @return numpy array - prediction results
+    '''
+    def predict(model: DecisionTreeClassifier | RandomForestClassifier | SVC | GradientBoostingClassifier | MLPClassifier | KNeighborsClassifier = None, X_test:np.ndarray = None, y_test: np.ndarray = None):
+        # ensure all parameters are supplied
+        if (model == None):
+            raise ValueError("Please specify a model for prediction.");
+        if (y_test is None):
+            raise ValueError("Please specify the actual labels for prediction.");
+        if (X_test is None):
+            raise ValueError("Please specify the samples for testing.");
+        # Prediction
+        y_pred:np.ndarray = model.predict(X_test);
+        return y_pred;
+    
     def normalize(self):
         scaler = StandardScaler(); # uses the z-score to calibrate
         le = LabelEncoder(); # convert categorical labels into numeric representation
@@ -191,3 +211,11 @@ class Models:
             traceback.print_exc();
             return False;
         return True;
+
+    # random search approach
+    def paramTuning(model: DecisionTreeClassifier | RandomForestClassifier | SVC | GradientBoostingClassifier | MLPClassifier | KNeighborsClassifier = None):
+        return RandomizedSearchCV(
+            estimator=model,
+            param_distributions=constants.randomSearch_distributions,
+            random_state=42
+        );

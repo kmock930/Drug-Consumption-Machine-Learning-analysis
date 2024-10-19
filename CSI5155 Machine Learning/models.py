@@ -217,5 +217,5 @@ class Models:
         return RandomizedSearchCV(
             estimator=model,
             param_distributions=constants.randomSearch_distributions,
-            random_state=42
+            random_state=constants.random_state
         );

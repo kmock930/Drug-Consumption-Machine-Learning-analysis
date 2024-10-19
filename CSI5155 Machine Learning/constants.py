@@ -113,3 +113,4 @@ randomSearch_distributions={
     "penalty": ['l2', 'l1'],
     "rvs": norm().rvs
 };
+random_state=42;

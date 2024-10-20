@@ -9,6 +9,7 @@ from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier;
 from sklearn.svm import SVC;
 from sklearn.neural_network import MLPClassifier;
 from sklearn.neighbors import KNeighborsClassifier;
+import seaborn as sns;
 
 '''
 @summary Function that evaluates number of True Positives
@@ -157,6 +158,7 @@ def plotROC(models: dict, X_test: np.ndarray, y_test: np.ndarray | list, dataset
     plt.title(f'Receiver Operating Characteristic (ROC) Curve for {dataset} dataset');
 
     # iterate through those 6 models
+    AUCs = [];
     if (len(models) > 0):
         for modelName in models:
             model = models[modelName];
@@ -164,6 +166,7 @@ def plotROC(models: dict, X_test: np.ndarray, y_test: np.ndarray | list, dataset
             fpr, tpr, _ = roc_curve(y_test, y_scores);
             auc = getAUC(y_test, y_scores);
             plt.plot(fpr, tpr, label=f'{modelName} (AUC = {auc:.2f})');
+            AUCs.append(auc);
 
     
     plt.legend(loc = 'lower right');
@@ -173,6 +176,7 @@ def plotROC(models: dict, X_test: np.ndarray, y_test: np.ndarray | list, dataset
     plt.ylabel('True Positive Rate');
     plt.xlabel('False Positive Rate');
     plt.show();
+    return AUCs;
 
 def getAUC(y_test, y_prob_scores):
     return metrics.roc_auc_score(y_test, y_prob_scores)
@@ -186,3 +190,15 @@ def getYScore(model, X_test: np.ndarray):
         # Use decision function for models like SVM without predict_proba
         y_scores = model.decision_function(X_test);
     return y_scores;
+
+# AUC校對圖
+def plotAUC_comparison(plotData: dict, dataset: str):
+    df = pd.DataFrame(plotData);
+    plt.figure(figsize=(10, 6));
+    sns.barplot(x='Classifier', y='AUC', hue='Method', data=df);
+    plt.title(f'Comparison of AUCs for Classifiers Under Different Balancing Methods - {dataset} dataset');
+    plt.xlabel('Classifier');
+    plt.ylabel('AUC');
+    plt.legend(title='Balancing Method', loc='lower right');
+    plt.tight_layout();
+    plt.show();

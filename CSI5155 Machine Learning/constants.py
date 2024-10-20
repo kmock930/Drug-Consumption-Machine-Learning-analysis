@@ -107,6 +107,48 @@ filepaths = {
     # mushrooms training set
     "mushrooms_train-set_labels": ".\mushrooms\Training Set\mushrooms_train-set_labels.pkl",
     'mushrooms_train-set_samples': ".\mushrooms\Training Set\mushrooms_train-set_samples.pkl",
+    # choc undersampled
+    "choc_posttrained_undersampled_decisionTree": ".\choc\posttrained\choc_model_decisionTree_posttrained_undersampled.pkl",
+    "choc_posttrained_undersampled_randomForest": ".\choc\posttrained\choc_model_randomForest_posttrained_undersampled.pkl",
+    "choc_posttrained_undersampled_SVC": ".\choc\posttrained\choc_model_SVC_RBF_posttrained_undersampled.pkl",
+    "choc_posttrained_undersampled_gradientBoost": ".\choc\posttrained\choc_model_Gradient_Boosting_posttrained_undersampled.pkl",
+    "choc_posttrained_undersampled_MLP": ".\choc\posttrained\choc_model_MLP_posttrained_undersampled.pkl",
+    "choc_posttrained_undersampled_KNN": ".\choc\posttrained\choc_model_KNN_posttrained_undersampled.pkl",
+    # choc oversampled
+    "choc_posttrained_oversampled_decisionTree": ".\choc\posttrained\choc_model_decisionTree_posttrained_oversampled.pkl",
+    "choc_posttrained_oversampled_randomForest": ".\choc\posttrained\choc_model_randomForest_posttrained_oversampled.pkl",
+    "choc_posttrained_oversampled_SVC": ".\choc\posttrained\choc_model_SVC_RBF_posttrained_oversampled.pkl",
+    "choc_posttrained_oversampled_gradientBoost": ".\choc\posttrained\choc_model_Gradient_Boosting_posttrained_oversampled.pkl",
+    "choc_posttrained_oversampled_MLP": ".\choc\posttrained\choc_model_MLP_posttrained_oversampled.pkl",
+    "choc_posttrained_oversampled_KNN": ".\choc\posttrained\choc_model_KNN_posttrained_oversampled.pkl",
+    # choc combinedsampled
+    "choc_posttrained_combinedsampled_decisionTree": ".\choc\posttrained\choc_model_decisionTree_posttrained_combinedsampled.pkl",
+    "choc_posttrained_combinedsampled_randomForest": ".\choc\posttrained\choc_model_randomForest_posttrained_combinedsampled.pkl",
+    "choc_posttrained_combinedsampled_SVC": ".\choc\posttrained\choc_model_SVC_RBF_posttrained_combinedsampled.pkl",
+    "choc_posttrained_combinedsampled_gradientBoost": ".\choc\posttrained\choc_model_Gradient_Boosting_posttrained_combinedsampled.pkl",
+    "choc_posttrained_combinedsampled_MLP": ".\choc\posttrained\choc_model_MLP_posttrained_combinedsampled.pkl",
+    "choc_posttrained_combinedsampled_KNN": ".\choc\posttrained\choc_model_KNN_posttrained_combinedsampled.pkl",
+    # mushrooms undersampled
+    "mushrooms_posttrained_undersampled_decisionTree": ".\mushrooms\posttrained\mushrooms_model_decisionTree_posttrained_undersampled.pkl",
+    "mushrooms_posttrained_undersampled_randomForest": ".\mushrooms\posttrained\mushrooms_model_randomForest_posttrained_undersampled.pkl",
+    "mushrooms_posttrained_undersampled_SVC": ".\mushrooms\posttrained\mushrooms_model_SVC_RBF_posttrained_undersampled.pkl",
+    "mushrooms_posttrained_undersampled_gradientBoost": ".\mushrooms\posttrained\mushrooms_model_Gradient_Boosting_posttrained_undersampled.pkl",
+    "mushrooms_posttrained_undersampled_MLP": ".\mushrooms\posttrained\mushrooms_model_MLP_posttrained_undersampled.pkl",
+    "mushrooms_posttrained_undersampled_KNN": ".\mushrooms\posttrained\mushrooms_model_KNN_posttrained_undersampled.pkl",
+    # mushrooms oversampled
+    "mushrooms_posttrained_oversampled_decisionTree": ".\mushrooms\posttrained\mushrooms_model_decisionTree_posttrained_oversampled.pkl",
+    "mushrooms_posttrained_oversampled_randomForest": ".\mushrooms\posttrained\mushrooms_model_randomForest_posttrained_oversampled.pkl",
+    "mushrooms_posttrained_oversampled_SVC": ".\mushrooms\posttrained\mushrooms_model_SVC_RBF_posttrained_oversampled.pkl",
+    "mushrooms_posttrained_oversampled_gradientBoost": ".\mushrooms\posttrained\mushrooms_model_Gradient_Boosting_posttrained_oversampled.pkl",
+    "mushrooms_posttrained_oversampled_MLP": ".\mushrooms\posttrained\mushrooms_model_MLP_posttrained_oversampled.pkl",
+    "mushrooms_posttrained_oversampled_KNN": ".\mushrooms\posttrained\mushrooms_model_KNN_posttrained_oversampled.pkl",
+    # mushrooms combinedsampled
+    "mushrooms_posttrained_combinedsampled_decisionTree": ".\mushrooms\posttrained\mushrooms_model_decisionTree_posttrained_combinedsampled.pkl",
+    "mushrooms_posttrained_combinedsampled_randomForest": ".\mushrooms\posttrained\mushrooms_model_randomForest_posttrained_combinedsampled.pkl",
+    "mushrooms_posttrained_combinedsampled_SVC": ".\mushrooms\posttrained\mushrooms_model_SVC_RBF_posttrained_combinedsampled.pkl",
+    "mushrooms_posttrained_combinedsampled_gradientBoost": ".\mushrooms\posttrained\mushrooms_model_Gradient_Boosting_posttrained_combinedsampled.pkl",
+    "mushrooms_posttrained_combinedsampled_MLP": ".\mushrooms\posttrained\mushrooms_model_MLP_posttrained_combinedsampled.pkl",
+    "mushrooms_posttrained_combinedsampled_KNN": ".\mushrooms\posttrained\mushrooms_model_KNN_posttrained_combinedsampled.pkl",
 };
 randomSearch_distributions={
     'max_depth': randint(1, 20).rvs(size=100),
@@ -126,3 +168,8 @@ randomSearch_distributions_distributions_KNN={
     'metric': ['euclidean', 'manhattan', 'minkowski']  # Distance metric
 }
 random_state=42;
+underSamplePercent=0.5;
+oversampledPercent=1.0;
+undersampled="undersampled";
+oversampled="oversampled";
+combinedsampled="combinedsampled";

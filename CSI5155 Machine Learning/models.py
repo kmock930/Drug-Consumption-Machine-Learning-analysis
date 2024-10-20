@@ -160,7 +160,7 @@ class Models:
         self.y_train = le.fit_transform(self.y_train);
         self.y_test = le.fit_transform(self.y_test);
     
-    def train(self, model: DecisionTreeClassifier | RandomForestClassifier | SVC | GradientBoostingClassifier | MLPClassifier | KNeighborsClassifier = None, dataset=constants.choco_dataset):
+    def train(self, model: DecisionTreeClassifier | RandomForestClassifier | SVC | GradientBoostingClassifier | MLPClassifier | KNeighborsClassifier = None, dataset=constants.choco_dataset, isSampled:str=None):
         try:
             exc_info = sys.exc_info();
 
@@ -177,7 +177,7 @@ class Models:
                 model.fit(self.X_train, self.y_train);
 
             # save all trained models
-            self.saveModels(isTrained=True, dataset=dataset); 
+            self.saveModels(isTrained=True, isSampled=isSampled, dataset=dataset);
         except:
             print("Failed to train a model.");
             traceback.print_exc();
@@ -185,7 +185,7 @@ class Models:
         print("All models are completely trained.");
         return True;
 
-    def saveModels(self, isTrained=False, dataset=constants.choco_dataset, **args):
+    def saveModels(self, isTrained=False, isSampled:str=None, dataset=constants.choco_dataset, **args):
         try:
             # format part of the filename
             # by deciding whether the saved model file is trained or untrained
@@ -195,18 +195,21 @@ class Models:
             else:
                 isTrained_string = '_pretrained';
             
+            if (isSampled != None):
+                isSampled = '_' + isSampled;
+            
             if (args== {} or constants.descisionTree in args):
-                joblib.dump(self.decisionTree_clf, dataset + '_model_decisionTree' + isTrained_string + '.pkl');
+                joblib.dump(self.decisionTree_clf, dataset + '_model_decisionTree' + isTrained_string + isSampled + '.pkl');
             if (args== {} or constants.randForest in args):
-                joblib.dump(self.randomForest_clf, dataset + '_model_randomForest' + isTrained_string + '.pkl');
+                joblib.dump(self.randomForest_clf, dataset + '_model_randomForest' + isTrained_string + isSampled + '.pkl');
             if (args== {} or constants.svm in args):
-                joblib.dump(self.svm_clf, dataset + '_model_SVC_RBF' + isTrained_string + '.pkl');
+                joblib.dump(self.svm_clf, dataset + '_model_SVC_RBF' + isTrained_string + isSampled + '.pkl');
             if (args== {} or constants.gradientBoost in args):
-                joblib.dump(self.gradientBoost_clf, dataset + '_model_Gradient_Boosting' + isTrained_string + '.pkl');
+                joblib.dump(self.gradientBoost_clf, dataset + '_model_Gradient_Boosting' + isTrained_string + isSampled + '.pkl');
             if (args== {} or constants.mlp in args):
-                joblib.dump(self.mlp_clf, dataset + '_model_MLP' + isTrained_string + '.pkl');
+                joblib.dump(self.mlp_clf, dataset + '_model_MLP' + isTrained_string + isSampled + '.pkl');
             if (args== {} or constants.knn in args):
-                joblib.dump(self.knn_clf, dataset + '_model_KNN' + isTrained_string + '.pkl');
+                joblib.dump(self.knn_clf, dataset + '_model_KNN' + isTrained_string + isSampled + '.pkl');
         except:
             traceback.print_exc();
             return False;

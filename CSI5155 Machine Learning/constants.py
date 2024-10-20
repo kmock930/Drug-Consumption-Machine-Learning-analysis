@@ -161,7 +161,7 @@ randomSearch_distributions_distributions_SVC={
     'degree': randint(2, 5)  # Only for polynomial kernels
 };
 randomSearch_distributions_distributions_KNN={
-    'n_neighbors': randint(1, 30),  # Number of neighbors to use
+    'n_neighbors': randint(1, 30, 2),  # Number of neighbors to use (odd numbers only)
     'weights': ['uniform', 'distance'],  # Weight function
     'algorithm': ['auto', 'ball_tree', 'kd_tree', 'brute'],  # Algorithm used to compute the nearest neighbors
     'leaf_size': randint(1, 50),  # Leaf size for BallTree or KDTree

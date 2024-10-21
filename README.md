@@ -13,3 +13,13 @@ The dataset can be found at this link: https://archive.ics.uci.edu/dataset/373/d
 - Identify potential issues in the dataset / the classifier itself.
 - Provide results from Evaluation with some useful plots and metrics.
 - Summarize the analysis in a report.
+# Project Structure
+- You should expect a report in `.pdf` format at the root level.
+- Please expand the folder at the root level to view codes.
+- This project branches out the analysis into 2 notebooks:
+  1. Modelling - please check the file `CSI5155 Assignment 1 Modelling Part- Kelvin Mock 300453668.ipynb`
+  2. Evaluation - please check the file `CSI5155 Assignment 1 Evaluation Part - Kelvin Mock 300453668.ipynb`
+- Models are data dumped into several `.pkl` files from time-to-time in different phases to maintain the code's maintainability.
+- The training sets and test sets are also data dumped into several `.pkl` files.
+- `choc` directory shows data dumped files related to the Chocolate dataset (which is split from the original dataset).
+- `mushrooms` directory shows data dumped files related to the Mushrooms dataset (which is also split from the original dataset).

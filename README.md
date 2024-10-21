@@ -1,5 +1,5 @@
 # Problem Statement
-## Aims:
+## Aims
 1. Convert the multi-class problems into binary classification tasks.
 2. Predict whether a person is a consumer of chocolate and magic mushroom.
 # Dataset: Drug Consumption Analysis Dataset

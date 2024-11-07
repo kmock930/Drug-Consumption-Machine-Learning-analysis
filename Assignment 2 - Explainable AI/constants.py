@@ -1,4 +1,5 @@
 ASM1_DIR = "../Assignment 1 - Model Comparison/";
+ASM1_DIR_ALT = "/Assignment 1 - Model Comparison/"
 filepaths = {
     # posttrainned models from assignment 1
     "choc_posttrained_decisionTree": "choc\posttrained\choc_model_decisionTree_posttrained.pkl",

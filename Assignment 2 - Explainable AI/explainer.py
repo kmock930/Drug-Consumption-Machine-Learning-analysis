@@ -13,7 +13,8 @@ import traceback;
 class explainer:
     treeExplainer: shap.TreeExplainer = None; # for decision tree or random forest
     linearExplainer: shap.LinearExplainer = None; # for SVM
-    kernelExplainer: shap.SamplingExplainer = None; # for MLP
+    permutationExplainer: shap.PermutationExplainer = None; # for MLP
+    kernelExplainer: shap.SamplingExplainer = None; # for others like KNN
     model: DecisionTreeClassifier | RandomForestClassifier | GradientBoostingClassifier | SVC | MLPClassifier | KNeighborsClassifier | RandomizedSearchCV;
 
     def __init__(self, model: DecisionTreeClassifier | RandomForestClassifier | GradientBoostingClassifier | SVC | MLPClassifier | KNeighborsClassifier | RandomizedSearchCV, data: np.ndarray, modelType: str = ""):
@@ -34,14 +35,19 @@ class explainer:
                         masker=shap.maskers.Partition(data)
                     );
                     print("A Linear explainer is instantiated successfully.");
-                case "mlp":
+                case "neural":
+                    self.permutationExplainer = shap.PermutationExplainer(
+                        model=self.model.predict,
+                        data=data,
+                        masker=shap.maskers.Partition(data)
+                    );
+                    print("A Permutation Kernel explainer is instantiated successfully.");
+                case _:
                     self.kernelExplainer = shap.SamplingExplainer(
                         model=self.model.predict,
                         data=data
                     );
                     print("A Sampling Kernel explainer is instantiated successfully.");
-                case "":
-                    raise ValueError("Missing or Invalid Type of explainer! Please instantiate again.");
         except:
             traceback.print_exc();
 
@@ -52,8 +58,11 @@ class explainer:
         elif (self.linearExplainer != None):
             print("A Linear explainer is found");
             return self.linearExplainer.shap_values(X_test);
+        elif (self.permutationExplainer != None):
+            print("A Permutation Explainer is found");
+            return self.permutationExplainer.shap_values(X_test);
         elif (self.kernelExplainer != None):
-            print("A kernel explainer is found");
+            print("A Sampling Kernel explainer is found");
             return self.kernelExplainer.shap_values(X_test);
         else:
             raise ValueError("Missing or Invalid Type of explainer! Please instantiate again.");

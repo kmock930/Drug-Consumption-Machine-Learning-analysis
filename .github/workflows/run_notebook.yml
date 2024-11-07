@@ -2,8 +2,6 @@ name: Execute Jupyter Notebook
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
 
 jobs:
   execute_notebook:

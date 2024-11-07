@@ -23,10 +23,10 @@ jobs:
 
       - name: Execute Jupyter Notebook
         run: |
-          jupyter nbconvert --to notebook --execute "Assignment 2 - Explainable AI/CSI5155 Assignment 2 - Kelvin Mock 300453668.ipynb"
+          jupyter nbconvert --to notebook --execute "Assignment 2 - Explainable AI/CSI5155 Assignment 2 - Kelvin Mock 300453668.ipynb" --output "CSI5155 Assignment 2 - Kelvin Mock 300453668.ipynb"
 
       - name: Upload executed notebook
         uses: actions/upload-artifact@v3
         with:
           name: executed-notebook
-          path: executed_CSI5155 Assignment 2 - Kelvin Mock 300453668.ipynb.ipynb
+          path: "executed_CSI5155 Assignment 2 - Kelvin Mock 300453668.ipynb"

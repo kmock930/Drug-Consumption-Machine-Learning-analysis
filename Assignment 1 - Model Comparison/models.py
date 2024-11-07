@@ -7,6 +7,7 @@ from sklearn.neighbors import KNeighborsClassifier;
 from sklearn.preprocessing import StandardScaler;
 from sklearn.preprocessing import LabelEncoder;
 from sklearn.model_selection import RandomizedSearchCV;
+from imblearn.pipeline import Pipeline;
 import joblib;
 import constants;
 import traceback;
@@ -160,7 +161,7 @@ class Models:
         self.y_train = le.fit_transform(self.y_train);
         self.y_test = le.fit_transform(self.y_test);
     
-    def train(self, model: DecisionTreeClassifier | RandomForestClassifier | SVC | GradientBoostingClassifier | MLPClassifier | KNeighborsClassifier = None, dataset=constants.choco_dataset, isSampled:str=None):
+    def train(self, model: DecisionTreeClassifier | RandomForestClassifier | SVC | GradientBoostingClassifier | MLPClassifier | KNeighborsClassifier | Pipeline = None, dataset=constants.choco_dataset, isSampled:str=None):
         try:
             exc_info = sys.exc_info();
 
@@ -197,6 +198,8 @@ class Models:
             
             if (isSampled != None):
                 isSampled = '_' + isSampled;
+            else:
+                isSampled = '';
             
             if (args== {} or constants.descisionTree in args):
                 joblib.dump(self.decisionTree_clf, dataset + '_model_decisionTree' + isTrained_string + isSampled + '.pkl');

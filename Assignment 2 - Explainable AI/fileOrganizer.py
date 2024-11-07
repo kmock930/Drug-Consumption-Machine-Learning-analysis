@@ -10,6 +10,7 @@ import os;
 import joblib;
 
 def unpack(filepath):
+    os.path.normpath(filepath);
     with open(filepath, 'rb') as file:
         return joblib.load(file);
 

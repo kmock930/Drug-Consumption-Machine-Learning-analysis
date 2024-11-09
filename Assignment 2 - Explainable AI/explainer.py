@@ -8,6 +8,7 @@ from sklearn.neighbors import KNeighborsClassifier;
 from sklearn.model_selection import RandomizedSearchCV;
 import numpy as np;
 import traceback;
+import constants;
 
 class explainer:
     '''
@@ -52,15 +53,16 @@ class explainer:
                     print("A Linear explainer is instantiated successfully.");
                 case "neural":
                     self.permutationExplainer = shap.PermutationExplainer(
-                        model=self.model.predict,
+                        model=self.model.predict_proba,
                         data=data,
                         masker=shap.maskers.Partition(data)
                     );
                     print("A Permutation Kernel explainer is instantiated successfully.");
-                case _:
+                case "non-linear-svm" | _:
                     self.kernelExplainer = shap.SamplingExplainer(
                         model=self.model.predict,
-                        data=data
+                        data=data,
+                        masker=shap.maskers.Independent(data)
                     );
                     print("A Sampling Kernel explainer is instantiated successfully.");
         except:
@@ -86,14 +88,14 @@ class explainer:
             return self.linearExplainer.shap_values(X_test);
         elif (self.permutationExplainer != None):
             print("A Permutation Explainer is found");
-            return self.permutationExplainer.shap_values(X_test);
+            return np.around(self.permutationExplainer.shap_values(X_test), constants.precision);
         elif (self.kernelExplainer != None):
             print("A Sampling Kernel explainer is found");
-            return self.kernelExplainer.shap_values(X_test);
+            return np.around(self.kernelExplainer.shap_values(X_test), constants.precision);
         else:
             raise ValueError("Missing or Invalid Type of explainer! Please instantiate again.");
 
-    def calBaseVal(self, model: MLPClassifier = None, X_train: np.ndarray = np.array([])):
+    def calBaseVal(self, model: MLPClassifier = None, X_train: np.ndarray = np.array([]), class_index = 1):
         '''
         This is a function which calculates the base value (for plotting purpose).
 
@@ -104,7 +106,7 @@ class explainer:
 
         Returns
         --------------
-        numpy.array([float])
+        float
         '''
         if (self.treeExplainer != None):
             print("A tree explainer is found.");
@@ -116,12 +118,12 @@ class explainer:
             print("A Permutation Explainer is found");
             if (len(X_train) == 0 or model == None):
                 raise ValueError("Missing model or training data. Cannot evaluate the base value.");
-            y_pred_train = model.predict(X_train);
-            baseVal = y_pred_train.mean();
+            y_pred_train = model.predict_proba(X_train);
+            baseVal = y_pred_train.mean(axis=0)[class_index];
         elif (self.kernelExplainer != None):
             print("A Sampling Kernel explainer is found");
             baseVal = self.kernelExplainer.expected_value;
         else:
             raise ValueError("Missing or Invalid Type of explainer! Please instantiate again.");
 
-        return np.array(baseVal);
+        return np.mean(baseVal);

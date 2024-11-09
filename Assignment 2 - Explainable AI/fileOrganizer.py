@@ -32,6 +32,7 @@ def organize():
         pretrained_dir = os.path.join(dataset_dir, 'pretrained');
         train_set_dir = os.path.join(dataset_dir, 'Training Set');
         test_set_dir = os.path.join(dataset_dir, 'Test Set');
+        columns_dir = os.path.join(dataset_dir, 'Columns');
 
         if not os.path.exists(trained_dir):
             os.makedirs(trained_dir);
@@ -72,6 +73,11 @@ def organize():
                 elif ('test-set' in file): # test set data
                     src_path = os.path.join(root_dir, file);
                     dest_path = os.path.join(test_set_dir, file);
+                    shutil.move(src_path, dest_path);
+                    print(f"Moved {file} to {os.path.join(test_set_dir)}");
+                elif ('columns' in file):
+                    src_path = os.path.join(root_dir, file);
+                    dest_path = os.path.join(columns_dir, file);
                     shutil.move(src_path, dest_path);
                     print(f"Moved {file} to {os.path.join(test_set_dir)}");
 

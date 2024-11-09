@@ -18,4 +18,10 @@ filepaths = {
     # mushrooms training set
     "mushrooms_train-set_labels": ".\mushrooms\Training Set\mushrooms_train-set_labels.pkl",
     'mushrooms_train-set_samples': ".\mushrooms\Training Set\mushrooms_train-set_samples.pkl",
+    # columns
+    "choco_columns": ".\choc\Columns\choc_columns.pkl",
+    "mush_columns": ".\mushrooms\Columns\mushrooms_columns.pkl"
 };
+precision:int=100;
+# for plotting
+index_samples:int=1;

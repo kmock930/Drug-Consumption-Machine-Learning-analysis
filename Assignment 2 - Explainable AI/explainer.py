@@ -106,7 +106,7 @@ class explainer:
 
         Returns
         --------------
-        float
+        float | numpy.ndarray - The base value
         '''
         if (self.treeExplainer != None):
             print("A tree explainer is found.");
@@ -126,4 +126,4 @@ class explainer:
         else:
             raise ValueError("Missing or Invalid Type of explainer! Please instantiate again.");
 
-        return np.mean(baseVal);
+        return baseVal;

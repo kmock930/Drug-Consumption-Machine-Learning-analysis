@@ -37,7 +37,6 @@ def plot(X: np.ndarray, y: np.ndarray, SHAP_values: list | np.ndarray, columns: 
     '''
     uniqueLabels = np.unique(y);
 
-
     if index_samples is not None:
         random_indices = random.sample(range(X.shape[0]), index_samples);
         X_sample = X[random_indices, :];
@@ -48,14 +47,16 @@ def plot(X: np.ndarray, y: np.ndarray, SHAP_values: list | np.ndarray, columns: 
     
     for class_index, class_name in enumerate(uniqueLabels):
         plot_title = f"{title} - class '{class_name}'" if title else f"Class '{class_name}'";
+        if ((isinstance(baseVal, np.ndarray) or isinstance(baseVal, list)) == True):
+            print(plot_title);
                 
         if (SHAP_values_sample.ndim == 3):
-            shap_values_for_class = SHAP_values_sample[:, :, class_index]; # (n_samples, n_features, class_index)
+            shap_values_for_class = SHAP_values_sample[:, :, class_index]; # resulting: (n_samples, n_features)
         elif (SHAP_values_sample.ndim == 2):
             shap_values_for_class = SHAP_values_sample;
         else:
             raise ValueError("Unexpected SHAP_values dimensions");
-        
+    
         match (plotType):
             case "summary":
                 plt.title(plot_title);
@@ -84,30 +85,40 @@ def plot(X: np.ndarray, y: np.ndarray, SHAP_values: list | np.ndarray, columns: 
                 plt.show();
             case "dependence":
                 shap.dependence_plot(
-                    SHAP_values=shap_values_for_class[index_samples, :], # (n_samples, n_features)
-                    X=X_sample[index_samples, :],
-                    interaction_index=None,
-                    feature_names=columns
+                    shap_values=shap_values_for_class,  # SHAP values (n_samples, n_features, n_classes)
+                    features=X_sample,  # Feature values
+                    interaction_index=random.randint(0, len(columns)-1), # Optional interaction index: int as  index of feature to show interaction with
+                    feature_names=columns,
+                    ind=random.randint(0, len(columns)-1), # Random index of the feature to color by
+                    title=title
                 );
-                plt.title(title);
-                plt.show();
             case "waterfall":
-                shap.waterfall_plot(
-                    baseVal[class_index] if isinstance(baseVal, np.ndarray) or isinstance(baseVal, list) else baseVal,
-                    shap_values_for_class[index_samples, :],
-                    feature_names=columns
-                );
                 plt.title(title);
+                plt.plot(plot_size=[8,6]);
+
+                # Adjust the scale of the plot
+                ax = plt.gca()
+                ax.xaxis.set_major_locator(plt.MultipleLocator(0.000005));
+                ax.xaxis.set_minor_locator(plt.MultipleLocator(0.000001));
+                ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f'{x:.6f}'));
+
+                shap.plots._waterfall.waterfall_legacy(
+                    baseVal[class_index] if isinstance(baseVal, np.ndarray) or isinstance(baseVal, list) else baseVal,
+                    shap_values_for_class[index_samples-1], # SHAP value: we get the inner part of the shape
+                    X_sample[random.randint(0, len(X_sample)-1), :] if X_sample is not None else None,  # Feature values for the instance to explain
+                    feature_names=columns, # Feature names
+                    max_display=len(columns), # Maximum number of features to display
+                );
                 plt.show();
                 if ((isinstance(baseVal, np.ndarray) or isinstance(baseVal, list)) == False):
                     break;
             case "decision":
                 shap.decision_plot(
                     baseVal[class_index] if isinstance(baseVal, np.ndarray) or isinstance(baseVal, list) else baseVal,
-                    shap_values_for_class[index_samples, :],
-                    feature_names=columns
+                    shap_values_for_class, # SHAP values for the instance to explain
+                    feature_names=columns,
+                    title=title
                 );
-                plt.title(title);
                 plt.show();
                 if ((isinstance(baseVal, np.ndarray) or isinstance(baseVal, list)) == False):
                     break;

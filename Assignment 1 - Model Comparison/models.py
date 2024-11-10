@@ -157,9 +157,9 @@ class Models:
         scaler = StandardScaler(); # uses the z-score to calibrate
         le = LabelEncoder(); # convert categorical labels into numeric representation
         self.X_train = scaler.fit_transform(self.X_train);
-        self.X_test = scaler.fit_transform(self.X_test);
+        self.X_test = scaler.transform(self.X_test);
         self.y_train = le.fit_transform(self.y_train);
-        self.y_test = le.fit_transform(self.y_test);
+        self.y_test = le.transform(self.y_test);
     
     def train(self, model: DecisionTreeClassifier | RandomForestClassifier | SVC | GradientBoostingClassifier | MLPClassifier | KNeighborsClassifier | Pipeline = None, dataset=constants.choco_dataset, isSampled:str=None):
         try:

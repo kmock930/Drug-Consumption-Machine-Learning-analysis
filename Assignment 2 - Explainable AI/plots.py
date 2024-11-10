@@ -47,7 +47,7 @@ def plot(X: np.ndarray, y: np.ndarray, SHAP_values: list | np.ndarray, columns: 
     
     for class_index, class_name in enumerate(uniqueLabels):
         plot_title = f"{title} - class '{class_name}'" if title else f"Class '{class_name}'";
-        if ((isinstance(baseVal, np.ndarray) or isinstance(baseVal, list)) == True):
+        if ((isinstance(baseVal, np.ndarray) or isinstance(baseVal, list)) == True or plotType in ("summary", "dependence")):
             print(plot_title);
                 
         if (SHAP_values_sample.ndim == 3):

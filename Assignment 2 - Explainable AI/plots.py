@@ -59,14 +59,17 @@ def plot(X: np.ndarray, y: np.ndarray, SHAP_values: list | np.ndarray, columns: 
     
         match (plotType):
             case "summary":
+                plt.figure(figsize=(12, 8));
                 plt.title(plot_title);
                 shap.summary_plot(
                     shap_values_for_class,
                     X_sample,
                     feature_names=columns
                 );
+                plt.tight_layout();
                 plt.show();
             case "force":
+                plt.figure(figsize=(12, 8));
                 shap.force_plot(
                     baseVal[class_index] if isinstance(baseVal, np.ndarray) or isinstance(baseVal, list) else baseVal, 
                     shap_values_for_class[index_samples-1], # (n_samples, n_features)
@@ -81,20 +84,25 @@ def plot(X: np.ndarray, y: np.ndarray, SHAP_values: list | np.ndarray, columns: 
                 ax.xaxis.set_minor_locator(plt.MultipleLocator(0.001));
                 ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f'{x:.4f}'));
 
-                plt.title(plot_title, y=1.75);
+                plt.title(plot_title, y=1.05);
+                plt.tight_layout();
                 plt.show();
             case "dependence":
+                plt.figure(figsize=(12, 8));
                 shap.dependence_plot(
                     shap_values=shap_values_for_class,  # SHAP values (n_samples, n_features, n_classes)
                     features=X_sample,  # Feature values
                     interaction_index=random.randint(0, len(columns)-1), # Optional interaction index: int as  index of feature to show interaction with
                     feature_names=columns,
                     ind=random.randint(0, len(columns)-1), # Random index of the feature to color by
-                    title=title
+                    title=title,
                 );
+                plt.tight_layout();
             case "waterfall":
+                plt.figure(figsize=(12, 8));
                 plt.title(title);
                 plt.plot(plot_size=[8,6]);
+                plt.tight_layout();
 
                 # Adjust the scale of the plot
                 ax = plt.gca()
@@ -102,23 +110,38 @@ def plot(X: np.ndarray, y: np.ndarray, SHAP_values: list | np.ndarray, columns: 
                 ax.xaxis.set_minor_locator(plt.MultipleLocator(0.000001));
                 ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f'{x:.6f}'));
 
-                shap.plots._waterfall.waterfall_legacy(
-                    baseVal[class_index] if isinstance(baseVal, np.ndarray) or isinstance(baseVal, list) else baseVal,
-                    shap_values_for_class[index_samples-1], # SHAP value: we get the inner part of the shape
-                    X_sample[random.randint(0, len(X_sample)-1), :] if X_sample is not None else None,  # Feature values for the instance to explain
-                    feature_names=columns, # Feature names
-                    max_display=len(columns), # Maximum number of features to display
-                );
-                plt.show();
+                assert(len(X_sample) == len(shap_values_for_class));
+                assert(index_samples == 1);
+                while (True):
+                    try:
+                        randInd: int = random.randint(0, len(X_sample)-1);
+
+                        shap.plots._waterfall.waterfall_legacy(
+                            baseVal[class_index] if isinstance(baseVal, np.ndarray) or isinstance(baseVal, list) else baseVal,
+                            shap_values_for_class[randInd, :], # SHAP value: we get the inner part of the shape
+                            X_sample[randInd, :] if X_sample is not None else None,  # Feature values for the instance to explain
+                            feature_names=columns, # Feature names
+                            max_display=len(columns), # Maximum number of features to display
+                        );
+                        plt.tight_layout();
+                        plt.show();
+                    except ValueError as e:
+                        if str(e) == "Image size of 727662x801 pixels is too large. It must be less than 2^16 in each direction.":
+                            continue;
+                        else:
+                            raise e;
+                    break;
                 if ((isinstance(baseVal, np.ndarray) or isinstance(baseVal, list)) == False):
                     break;
             case "decision":
+                plt.figure(figsize=(12, 8));
                 shap.decision_plot(
                     baseVal[class_index] if isinstance(baseVal, np.ndarray) or isinstance(baseVal, list) else baseVal,
                     shap_values_for_class, # SHAP values for the instance to explain
                     feature_names=columns,
                     title=title
                 );
+                plt.tight_layout();
                 plt.show();
                 if ((isinstance(baseVal, np.ndarray) or isinstance(baseVal, list)) == False):
                     break;

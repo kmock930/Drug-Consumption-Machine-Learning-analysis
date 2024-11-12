@@ -3,7 +3,7 @@
 1. Convert the multi-class problems into binary classification tasks.
 2. Predict whether a person is a consumer of chocolate and magic mushroom.
 3. Choose the best and worst classifiers for each dataset. 
-4. Explain whether the predictions are trustable, with the calculation of SHAP values and some visualization plots.
+4. Explain AI models in a scientific manner which should be convincable to non-technical people.
 # Dataset: Drug Consumption Analysis Dataset
 The dataset can be found at this link: https://archive.ics.uci.edu/dataset/373/drug+consumption+quantified.
 ## Description of the Dataset
@@ -15,6 +15,7 @@ The dataset can be found at this link: https://archive.ics.uci.edu/dataset/373/d
 - Identify potential issues in the dataset / the classifier itself.
 - Provide results from Evaluation with some useful plots and metrics.
 - Summarize the analysis in a report.
+- Explain whether certain classifiers make trustable predictions, with the calculation of SHAP values and some visualization plots.
 # Project Structure
 - You should expect a report in `.pdf` format at the root level.
 - Please expand the folder at the root level to view codes.

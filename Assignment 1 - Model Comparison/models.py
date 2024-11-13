@@ -74,7 +74,7 @@ class Models:
             self.mlp_clf = MLPClassifier(
                 hidden_layer_sizes=constants.mlp_hidden_layer_size,
                 activation=constants.mlp_activation, # Activation function
-                solver=constants.mlp_solver, # weight optimization
+                #solver=constants.mlp_solver, # weight optimization
                 alpha=constants.mlp_alpha, # Strength of the L2 regularization
                 learning_rate=constants.mlp_LearningRate,
                 max_iter=constants.mlp_maxItr,
@@ -234,6 +234,12 @@ class Models:
                 param_distributions=constants.randomSearch_distributions_distributions_KNN,
                 random_state=constants.random_state
             );
+        elif (isinstance(model, MLPClassifier)):
+            return RandomizedSearchCV(
+                estimator=model,
+                param_distributions=constants.randomSearch_distributions_MLP,
+                random_state=constants.random_state
+            )
         else:
             return RandomizedSearchCV(
                 estimator=model,

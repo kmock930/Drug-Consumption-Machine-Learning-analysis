@@ -154,6 +154,14 @@ randomSearch_distributions={
     'max_depth': randint(1, 20).rvs(size=100),
     'min_samples_split': uniform(0.1, 0.9)
 };
+randomSearch_distributions_MLP={
+    'hidden_layer_sizes': [(50,), (100,), (50, 50), (100, 50)],
+    'activation': ['tanh', 'relu'],
+    'solver': ['sgd', 'adam'],
+    'alpha': [0.0001, 0.05],
+    'learning_rate': ['constant', 'adaptive'],
+    'max_iter': [200, 500]
+};
 randomSearch_distributions_distributions_SVC={
     'C': uniform(0.1, 10),  # Regularization parameter
     'kernel': ['linear', 'poly', 'rbf', 'sigmoid'],  # Kernel types

@@ -2,7 +2,6 @@
 ASM1_DIR = "Assignment 1 - Model Comparison";
 ASM2_DIR = "Assignment 2 - Explainable AI";
 # datasets
-CHOC_DIR = "choc";
 MUSH_DIR = "mushrooms";
 # data / model type
 POSTTRAINED_DIR = "posttrained";
@@ -12,6 +11,7 @@ COLUMNS_DIR = "Columns";
 
 # model re-used
 MODEL_FILENAME = "mushrooms_model_Gradient_Boosting_posttrained.pkl";
+MODEL_DIR = "model";
 
 # data re-used
 X_TRAIN_FILENAME = "mushrooms_train-set_samples.pkl";

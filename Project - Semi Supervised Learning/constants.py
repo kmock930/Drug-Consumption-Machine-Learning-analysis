@@ -18,6 +18,11 @@ X_TRAIN_FILENAME = "mushrooms_train-set_samples.pkl";
 Y_TRAIN_FILENAME = "mushrooms_train-set_labels.pkl";
 X_TEST_FILENAME = "mushrooms_test-set_samples.pkl";
 Y_TEST_FILENAME = "mushrooms_test-set_labels.pkl";
+# normalized data re-used
+X_TRAIN_NORMALIZED_FILENAME = "mushrooms_train-set_samples_normalized.pkl";
+Y_TRAIN_NORMALIZED_FILENAME = "mushrooms_train-set_labels_normalized.pkl";
+X_TEST_NORMALIZED_FILENAME = "mushrooms_test-set_samples_normalized.pkl";
+Y_TEST_NORMALIZED_FILENAME = "mushrooms_test-set_labels_normalized.pkl";
 
 # columns file
 COLUMNS_FILENAME = "mushrooms_columns.pkl";

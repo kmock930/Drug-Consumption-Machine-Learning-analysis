@@ -12,7 +12,6 @@ import joblib;
 import constants;
 import traceback;
 import sys;
-import datetime;
 
 '''
 @summary A class which encapsulates various models which have been initialized
@@ -163,24 +162,17 @@ class Models:
         self.y_test = le.transform(self.y_test);
     
     def train(self, model: DecisionTreeClassifier | RandomForestClassifier | SVC | GradientBoostingClassifier | MLPClassifier | KNeighborsClassifier | Pipeline = None, dataset=constants.choco_dataset, isSampled:str=None):
-        startTime:datetime.datetime = datetime.datetime.now();
         try:
             exc_info = sys.exc_info();
 
             if not model:
                 print('Training all models');
                 self.decisionTree_clf.fit(self.X_train, self.y_train);
-                print(f'Completed training decision tree, in {datetime.datetime.now() - startTime}s');
                 self.randomForest_clf.fit(self.X_train, self.y_train);
-                print(f'Completed training random forest, in {datetime.datetime.now() - startTime}s');
                 self.svm_clf.fit(self.X_train, self.y_train);
-                print(f'Completed training SVM, in {datetime.datetime.now() - startTime}s');
                 self.gradientBoost_clf.fit(self.X_train, self.y_train);
-                print(f'Completed training gradient boosting, in {datetime.datetime.now() - startTime}s');
                 self.mlp_clf.fit(self.X_train, self.y_train);
-                print(f'Completed training MLP, in {datetime.datetime.now() - startTime}s');
                 self.knn_clf.fit(self.X_train, self.y_train);
-                print(f'Completed training KNN, in {datetime.datetime.now() - startTime}s');
             else:
                 print('Training the specific model')
                 model.fit(self.X_train, self.y_train);
@@ -191,9 +183,7 @@ class Models:
             print("Failed to train a model.");
             traceback.print_exc();
             return False;
-        endTime:datetime.datetime = datetime.datetime.now();
-        timeElapsed = endTime - startTime;
-        print("All models are completely trained, within " + str(timeElapsed) + "s");
+        print("All models are completely trained.");
         return True;
 
     def saveModels(self, isTrained=False, isSampled:str=None, dataset=constants.choco_dataset, **args):

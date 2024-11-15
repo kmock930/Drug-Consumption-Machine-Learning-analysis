@@ -160,7 +160,7 @@ randomSearch_distributions_MLP={
     'solver': ['sgd', 'adam'],
     'alpha': [0.0001, 0.05],
     'learning_rate': ['constant', 'adaptive'],
-    'max_iter': [200, 500]
+    'max_iter': [1000, 1000]
 };
 randomSearch_distributions_distributions_SVC={
     'C': uniform(0.1, 10),  # Regularization parameter

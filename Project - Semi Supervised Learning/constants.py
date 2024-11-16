@@ -23,6 +23,19 @@ X_TRAIN_NORMALIZED_FILENAME = "mushrooms_train-set_samples_normalized.pkl";
 Y_TRAIN_NORMALIZED_FILENAME = "mushrooms_train-set_labels_normalized.pkl";
 X_TEST_NORMALIZED_FILENAME = "mushrooms_test-set_samples_normalized.pkl";
 Y_TEST_NORMALIZED_FILENAME = "mushrooms_test-set_labels_normalized.pkl";
+# labelled data
+X_TRAIN_LABELLED_FILENAME = "mushrooms_train-set_samples_labelled.pkl";
+Y_TRAIN_LABELLED_FILENAME = "mushrooms_train-set_labels_labelled.pkl";
+# unlabeled data
+X_TRAIN_UNLABELLED_FILENAME = "mushrooms_train-set_samples_unlabelled.pkl";
+Y_TRAIN_UNLABELLED_FILENAME = "mushrooms_train-set_labels_unlabelled.pkl";
+# Pseudo-labelled data
+Y_TRAIN_PSEUDO_FILENAME = "mushrooms_train-set_samples_pseudo.pkl";
 
 # columns file
 COLUMNS_FILENAME = "mushrooms_columns.pkl";
+
+# Labelled-Unlabelled portion
+LABELLED_PORTION = 0.2;
+
+RANDOM_STATE = 42;

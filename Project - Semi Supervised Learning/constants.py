@@ -11,6 +11,7 @@ COLUMNS_DIR = "Columns";
 
 # model re-used
 MODEL_FILENAME = "mushrooms_model_Gradient_Boosting_posttrained.pkl";
+MODEL_SELFTRAIN_FILENAME = "mushrooms_model_Gradient_Boosting_selftrained.pkl";
 MODEL_DIR = "model";
 
 # data re-used

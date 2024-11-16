@@ -114,6 +114,14 @@ def evalRecall(y_pred, y_test):
     except ZeroDivisionError:
         return 0;
 
+def evalF1Score(y_pred, y_test):
+    precision = evalPrecision(y_pred, y_test);
+    recall = evalRecall(y_pred, y_test);
+    try:
+        return 2 * (precision * recall) / (precision + recall);
+    except ZeroDivisionError:
+        return 0;
+
 '''
 @summary Function that displays the prediction performance in a well-formatted confusion matrix
 @param y_pred numpy.array: an array of predicted labels

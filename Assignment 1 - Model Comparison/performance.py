@@ -160,7 +160,7 @@ def evalPredictionNum(y_pred: np.ndarray, y_test: np.ndarray, truePred: bool = N
     else:
         return np.sum(evalArray == truePred)  # count of true or false predictions
 
-def plotROC(models: dict, X_test: np.ndarray, y_test: np.ndarray | list, dataset: str):
+def plotROC(models: dict, X_test: np.ndarray, y_test: np.ndarray | list, dataset: str, y_pred_proba: tuple = None, combined: bool = False):
     plt.figure(figsize=(10, 8));
     # https://scikit-learn.org/1.0/modules/generated/sklearn.metrics.plot_roc_curve.html
     plt.title(f'Receiver Operating Characteristic (ROC) Curve for {dataset} dataset');
@@ -170,7 +170,12 @@ def plotROC(models: dict, X_test: np.ndarray, y_test: np.ndarray | list, dataset
     if (len(models) > 0):
         for modelName in models:
             model = models[modelName];
-            y_scores = getYScore(model, X_test);
+            if (combined and isinstance(model, tuple)):
+                score1, score2 = y_pred_proba[0][:, 1], y_pred_proba[1][:, 1];
+                y_scores = (score1 + score2) / 2; # average the scores
+            else:
+                y_scores = getYScore(model, X_test);
+            
             fpr, tpr, _ = roc_curve(y_test, y_scores);
             auc = getAUC(y_test, y_scores);
             plt.plot(fpr, tpr, label=f'{modelName} (AUC = {auc:.2f})');
@@ -190,6 +195,8 @@ def getAUC(y_test, y_prob_scores):
     return metrics.roc_auc_score(y_test, y_prob_scores)
 
 def getYScore(model, X_test: np.ndarray):
+    if (isinstance(model, tuple)):
+        return getYScore(model[0], X_test), getYScore(model[1], X_test);
     # Get predicted probabilities (for classifiers like SVM, set probability=True)
     if hasattr(model, "predict_proba"):
         # Get probabilities for the positive class

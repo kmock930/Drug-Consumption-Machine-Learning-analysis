@@ -12,6 +12,9 @@ COLUMNS_DIR = "Columns";
 # model re-used
 MODEL_FILENAME = "mushrooms_model_Gradient_Boosting_posttrained.pkl";
 MODEL_SELFTRAIN_FILENAME = "mushrooms_model_Gradient_Boosting_selftrained.pkl";
+MODEL_COTRAIN_FILENAME = "mushrooms_model_Gradient_Boosting_cotrained.pkl";
+MODEL_COTRAIN_1_FILENAME = "mushrooms_model_Gradient_Boosting_cotrained_1.pkl";
+MODEL_COTRAIN_2_FILENAME = "mushrooms_model_Gradient_Boosting_cotrained_2.pkl";
 MODEL_DIR = "model";
 
 # data re-used
@@ -38,5 +41,8 @@ COLUMNS_FILENAME = "mushrooms_columns.pkl";
 
 # Labelled-Unlabelled portion
 LABELLED_PORTION = 0.2;
+
+# co training feature split
+CO_TRAINING_FEATURE_SPLIT = 0.5;
 
 RANDOM_STATE = 42;

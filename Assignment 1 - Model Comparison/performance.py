@@ -148,9 +148,9 @@ def evalPredictionNum(y_pred: np.ndarray, y_test: np.ndarray, truePred: bool = N
         
     evalArray: np.ndarray = y_pred == y_test;
     if (truePred == None):
-        return len(evalArray); # all predictions
+        return np.sum(evalArray);  # count of true predictions
     else:
-        return len(evalArray[evalArray == truePred]);
+        return np.sum(evalArray == truePred)  # count of true or false predictions
 
 def plotROC(models: dict, X_test: np.ndarray, y_test: np.ndarray | list, dataset: str):
     plt.figure(figsize=(10, 8));

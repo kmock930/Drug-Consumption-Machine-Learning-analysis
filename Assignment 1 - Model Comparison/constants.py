@@ -20,7 +20,7 @@ mlp_activation="relu"; # Rectified Linear Unit: no bound for input
 mlp_solver="adam"; # stochastic gradient-based optimizer
 mlp_alpha=0.0001;
 mlp_LearningRate="adaptive"; # keeps the learning rate constant to ‘learning_rate_init’ as long as training loss keeps decreasing
-mlp_maxItr=500; # increase to avoid convergence warning
+mlp_maxItr=2000; # increase to avoid convergence warning
 knn="k‐nearest neighbour (k-NN) classifier";
 knn_neighbors=random.randrange(3,9,2); # randomize an odd number for k
 knn_weights="distance"; # weight points by the inverse of their distance
@@ -160,7 +160,7 @@ randomSearch_distributions_MLP={
     'solver': ['sgd', 'adam'],
     'alpha': [0.0001, 0.05],
     'learning_rate': ['constant', 'adaptive'],
-    'max_iter': [1000, 1000]
+    'max_iter': [2000, 2000]
 };
 randomSearch_distributions_distributions_SVC={
     'C': uniform(0.1, 10),  # Regularization parameter

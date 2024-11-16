@@ -75,11 +75,14 @@ class Models:
             self.mlp_clf = MLPClassifier(
                 hidden_layer_sizes=constants.mlp_hidden_layer_size,
                 activation=constants.mlp_activation, # Activation function
-                #solver=constants.mlp_solver, # weight optimization
+                solver=constants.mlp_solver, # weight optimization
                 alpha=constants.mlp_alpha, # Strength of the L2 regularization
                 learning_rate=constants.mlp_LearningRate,
                 max_iter=constants.mlp_maxItr,
-                shuffle=True # shuffle samples in each iteration
+                shuffle=True, # shuffle samples in each iteration
+                early_stopping=True,  # Enable early stopping
+                n_iter_no_change=10,  # Number of iterations with no improvement to wait before stopping
+                verbose=True  # Enable verbose output to monitor the training process
             );
         else:
             self.mlp_clf = mlp_clf;

@@ -35,7 +35,8 @@ X_TRAIN_UNLABELLED_FILENAME = "mushrooms_train-set_samples_unlabelled.pkl";
 Y_TRAIN_UNLABELLED_FILENAME = "mushrooms_train-set_labels_unlabelled.pkl";
 # Pseudo-labelled data
 Y_TRAIN_PSEUDO_FILENAME = "mushrooms_train-set_samples_pseudo.pkl";
-
+# co-training data
+CO_TRAINING_BEST_FEATURE_SPLIT_RESULTS_FILENAME = "mushrooms_cotraining_best_feature_split_results.pkl";
 # columns file
 COLUMNS_FILENAME = "mushrooms_columns.pkl";
 

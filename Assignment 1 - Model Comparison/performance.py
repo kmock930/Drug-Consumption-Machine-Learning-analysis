@@ -160,30 +160,29 @@ def evalPredictionNum(y_pred: np.ndarray, y_test: np.ndarray, truePred: bool = N
     else:
         return np.sum(evalArray == truePred)  # count of true or false predictions
 
-def plotROC(models: dict, X_test: np.ndarray, y_test: np.ndarray | list, dataset: str, y_pred_proba: tuple = None, combined: bool = False):
+def plotROC(models: dict, X_test: np.ndarray, y_test: np.ndarray | list, dataset: str, feature_subsets: dict = None):
     plt.figure(figsize=(10, 8));
     # https://scikit-learn.org/1.0/modules/generated/sklearn.metrics.plot_roc_curve.html
     plt.title(f'Receiver Operating Characteristic (ROC) Curve for {dataset} dataset');
 
-    # iterate through those 6 models
+    # Iterate through the models
     AUCs = [];
-    if (len(models) > 0):
-        for modelName in models:
-            model = models[modelName];
-            if (combined and isinstance(model, tuple)):
-                score1, score2 = y_pred_proba[0][:, 1], y_pred_proba[1][:, 1];
-                y_scores = (score1 + score2) / 2; # average the scores
+    if len(models) > 0:
+        for modelName, model in models.items():
+            if feature_subsets and modelName in feature_subsets:
+                X_test_subset = X_test[:, feature_subsets[modelName]];
             else:
-                y_scores = getYScore(model, X_test);
+                X_test_subset = X_test;
+            
+            y_scores = getYScore(model, X_test_subset);
             
             fpr, tpr, _ = roc_curve(y_test, y_scores);
             auc = getAUC(y_test, y_scores);
             plt.plot(fpr, tpr, label=f'{modelName} (AUC = {auc:.2f})');
             AUCs.append(auc);
 
-    
-    plt.legend(loc = 'lower right');
-    plt.plot([0, 1], [0, 1],'r--');
+    plt.legend(loc='lower right');
+    plt.plot([0, 1], [0, 1], 'r--');
     plt.xlim([0, 1]);
     plt.ylim([0, 1]);
     plt.ylabel('True Positive Rate');
@@ -192,10 +191,10 @@ def plotROC(models: dict, X_test: np.ndarray, y_test: np.ndarray | list, dataset
     return AUCs;
 
 def getAUC(y_test, y_prob_scores):
-    return metrics.roc_auc_score(y_test, y_prob_scores)
+    return metrics.roc_auc_score(y_test, y_prob_scores);
 
 def getYScore(model, X_test: np.ndarray):
-    if (isinstance(model, tuple)):
+    if isinstance(model, tuple):
         return getYScore(model[0], X_test), getYScore(model[1], X_test);
     # Get predicted probabilities (for classifiers like SVM, set probability=True)
     if hasattr(model, "predict_proba"):

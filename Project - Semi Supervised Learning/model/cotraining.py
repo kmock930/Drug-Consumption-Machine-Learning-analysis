@@ -1,3 +1,7 @@
+'''
+@author: Kelvin Mock
+'''
+
 import pandas as pd
 from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier;
 from sklearn.metrics import accuracy_score, roc_auc_score, confusion_matrix, roc_curve

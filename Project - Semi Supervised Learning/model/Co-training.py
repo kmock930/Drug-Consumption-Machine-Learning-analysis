@@ -1,6 +1,14 @@
 import pandas as pd
 from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
-from sklearn.metrics import accuracy_score, roc_auc_score, confusion_matrix, roc_curve
+from sklearn.metrics import (
+    accuracy_score,
+    roc_auc_score,
+    confusion_matrix,
+    roc_curve,
+    precision_score,
+    recall_score,
+    f1_score,
+)
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -10,7 +18,6 @@ import random
 import numpy as np
 import json
 from scipy.cluster.hierarchy import linkage, fcluster
-
 
 # Load Split Data
 def load_split_data_pickle(directory='split_data_pickle'):
@@ -32,7 +39,6 @@ def load_split_data_pickle(directory='split_data_pickle'):
         loaded_data['scaler.pkl'],
     )
 
-
 # Feature Splitting Methods
 def random_split_features(X, view_size_ratio=0.5):
     all_features = X.columns.tolist()
@@ -41,7 +47,6 @@ def random_split_features(X, view_size_ratio=0.5):
     view1_features = all_features[:split_index]
     view2_features = all_features[split_index:]
     return X[view1_features], X[view2_features], view1_features, view2_features
-
 
 def pca_based_split(X, view_size_ratio=0.5):
     pca = PCA(n_components=min(X.shape[1], 2))
@@ -52,7 +57,6 @@ def pca_based_split(X, view_size_ratio=0.5):
     view1_features = X.columns[feature_ranking[:split_index]].tolist()
     view2_features = X.columns[feature_ranking[split_index:]].tolist()
     return X[view1_features], X[view2_features], view1_features, view2_features
-
 
 def correlation_based_split(X, view_size_ratio=0.5):
     correlation_matrix = X.corr().abs()
@@ -66,69 +70,33 @@ def correlation_based_split(X, view_size_ratio=0.5):
     view2_features = view2_features[:len(view2_features) - split_index]
     return X[view1_features], X[view2_features], view1_features, view2_features
 
-
 def importance_based_split(X, y, view_size_ratio=0.5):
-    # Align X and y lengths
     labeled_indices = y.index
     X = X.loc[labeled_indices]
 
-    # Train Random Forest on labeled data
     rf = RandomForestClassifier(random_state=42)
     rf.fit(X, y)
 
-    # Rank features by importance
     feature_importances = pd.Series(rf.feature_importances_, index=X.columns).sort_values(ascending=False)
 
-    # Split features based on importance
     split_index = int(len(feature_importances) * view_size_ratio)
     view1_features = feature_importances.index[:split_index].tolist()
     view2_features = feature_importances.index[split_index:].tolist()
 
     return X[view1_features], X[view2_features], view1_features, view2_features
 
-
-# Plotting Utilities
-def plot_confusion_matrix(y_true, y_pred, method_name):
-    conf_matrix = confusion_matrix(y_true, y_pred)
-    plt.figure(figsize=(6, 4))
-    sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', xticklabels=['Class 0', 'Class 1'],
-                yticklabels=['Class 0', 'Class 1'])
-    plt.ylabel('Actual')
-    plt.xlabel('Predicted')
-    plt.title(f'Confusion Matrix ({method_name})')
-    plt.tight_layout()
-    plt.savefig(f'confusion_matrix_{method_name}.png')
-    plt.show()
-
-
-def plot_roc_curve(y_true, y_pred_proba, auc, method_name):
-    fpr, tpr, _ = roc_curve(y_true, y_pred_proba)
-    plt.figure(figsize=(6, 4))
-    plt.plot(fpr, tpr, color='darkorange', lw=2, label=f'ROC curve (AUC = {auc:.2f})')
-    plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.title(f'ROC Curve ({method_name})')
-    plt.legend(loc="lower right")
-    plt.tight_layout()
-    plt.savefig(f'roc_curve_{method_name}.png')
-    plt.show()
-
-
-# Co-Training Framework
+# Evaluation Function
 def evaluate_feature_split_methods(methods, X_train, X_test, y_train, y_test, view_size_ratio=0.5):
     results = []
-    best_auc = -1
-    best_method = None
-
     for method in methods:
         print(f"\n=== Evaluating Method: {method.__name__} ===")
 
         if method == importance_based_split:
-            # Filter out unlabeled data for both X_train and y_train
             labeled_mask = y_train != -1
+            X_train_labeled = X_train[labeled_mask]
+            y_train_labeled = y_train[labeled_mask]
             X_train_view1, X_train_view2, features_view1, features_view2 = method(
-                X_train[labeled_mask], y_train[labeled_mask], view_size_ratio=view_size_ratio
+                X_train_labeled, y_train_labeled, view_size_ratio=view_size_ratio
             )
         else:
             X_train_view1, X_train_view2, features_view1, features_view2 = method(
@@ -142,35 +110,91 @@ def evaluate_feature_split_methods(methods, X_train, X_test, y_train, y_test, vi
         clf2 = GradientBoostingClassifier(random_state=42)
 
         labeled_mask = y_train != -1
-        clf1.fit(X_train_view1[labeled_mask], y_train[labeled_mask])
-        clf2.fit(X_train_view2[labeled_mask], y_train[labeled_mask])
+        X_train_view1_labeled = X_train_view1.loc[labeled_mask]
+        X_train_view2_labeled = X_train_view2.loc[labeled_mask]
+        y_train_labeled = y_train[labeled_mask]
+
+        clf1.fit(X_train_view1_labeled, y_train_labeled)
+        clf2.fit(X_train_view2_labeled, y_train_labeled)
 
         y_pred1 = clf1.predict(X_test_view1)
         y_pred2 = clf2.predict(X_test_view2)
         y_pred = (y_pred1 + y_pred2) >= 1  # Majority vote
-        y_pred_proba = (clf1.predict_proba(X_test_view1)[:, 1] + clf2.predict_proba(X_test_view2)[:, 1]) / 2
+        y_pred_proba = (
+            clf1.predict_proba(X_test_view1)[:, 1] + clf2.predict_proba(X_test_view2)[:, 1]
+        ) / 2
 
         auc = roc_auc_score(y_test, y_pred_proba)
         accuracy = accuracy_score(y_test, y_pred)
+        precision = precision_score(y_test, y_pred)
+        recall = recall_score(y_test, y_pred)
+        f1 = f1_score(y_test, y_pred)
 
         results.append({
             'method': method.__name__,
-            'features_view1': features_view1,
-            'features_view2': features_view2,
+            'view_size_ratio': view_size_ratio,
             'auc': auc,
             'accuracy': accuracy,
-            'y_pred': y_pred.tolist(),
+            'precision': precision,
+            'recall': recall,
+            'f1_score': f1,
             'y_pred_proba': y_pred_proba.tolist()
         })
 
-        print(f"Method: {method.__name__} | AUC: {auc:.4f} | Accuracy: {accuracy:.4f}")
+        print(
+            f"Method: {method.__name__} | AUC: {auc:.4f} | Accuracy: {accuracy:.4f} | "
+            f"Precision: {precision:.4f} | Recall: {recall:.4f} | F1 Score: {f1:.4f}"
+        )
 
-        if auc > best_auc:
-            best_auc = auc
-            best_method = method
+    return results
 
-    return best_method, results
+# Visualization of Combined ROC-AUC
+def plot_combined_roc_auc(results_df, y_test, view_size_ratio):
+    plt.figure(figsize=(10, 6))
+    methods = results_df['method'].unique()
 
+    for method in methods:
+        method_data = results_df[
+            (results_df['method'] == method) & (results_df['view_size_ratio'] == view_size_ratio)
+        ]
+        if not method_data.empty:
+            best_result = method_data.iloc[0]
+            y_pred_proba = np.array(best_result['y_pred_proba'])
+            fpr, tpr, _ = roc_curve(y_test, y_pred_proba)
+
+            plt.plot(fpr, tpr, label=f'{method} (AUC = {best_result["auc"]:.2f})')
+
+    plt.plot([0, 1], [0, 1], 'k--', label='Chance')
+    plt.title(f'ROC Curves for All Methods at View Size Ratio {view_size_ratio}')
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.legend(loc='lower right')
+    plt.grid(True)
+    plt.savefig(f'ROC_Comparison_Ratio_{view_size_ratio}.png')
+    plt.show()
+
+# Visualization of Metrics
+def visualize_metrics(results_df):
+    metrics = ['accuracy', 'precision', 'recall', 'f1_score']
+    methods_list = results_df['method'].unique()
+
+    for metric in metrics:
+        plt.figure(figsize=(10, 6))
+        for method in methods_list:
+            method_data = results_df[results_df['method'] == method]
+            plt.plot(
+                method_data['view_size_ratio'],
+                method_data[metric],
+                marker='o',
+                label=method
+            )
+        plt.title(f'{metric.capitalize()} vs. View Size Ratio for Different Methods')
+        plt.xlabel('View Size Ratio')
+        plt.ylabel(metric.capitalize())
+        plt.legend()
+        plt.grid(True)
+        plt.savefig(f'{metric.capitalize()}_vs_View_Size_Ratio.png')
+        plt.show()
 
 def main():
     X_train, X_test, y_train, y_test, scaler = load_split_data_pickle()
@@ -182,30 +206,27 @@ def main():
     n_unlabeled = int(len(y_train) * unlabeled_fraction)
     np.random.seed(42)
     unlabeled_indices = np.random.choice(y_train.index, n_unlabeled, replace=False)
-    y_train.loc[unlabeled_indices] = -1  # Mark as unlabeled
+    y_train.loc[unlabeled_indices] = -1
 
     methods = [random_split_features, pca_based_split, correlation_based_split, importance_based_split]
-
-    view_size_ratios = [0.3, 0.5, 0.7]  # Try different feature size ratios
+    view_size_ratios = [0.3, 0.5, 0.7]
     all_results = []
 
     for ratio in view_size_ratios:
         print(f"\n=== Evaluating with View Size Ratio: {ratio} ===")
-        best_method, ratio_results = evaluate_feature_split_methods(
-            methods, X_train_scaled, X_test_scaled, y_train, y_test, view_size_ratio=ratio
-        )
-        all_results.extend(ratio_results)
+        results = evaluate_feature_split_methods(methods, X_train_scaled, X_test_scaled, y_train, y_test, view_size_ratio=ratio)
+        all_results.extend(results)
 
-    with open('feature_split_comparison_results.json', 'w') as f:
-        json.dump(all_results, f, indent=4)
+    results_df = pd.DataFrame(all_results)
 
-    best_result = max(all_results, key=lambda x: x['auc'])
-    plot_confusion_matrix(y_test, best_result['y_pred'], best_result['method'])
-    plot_roc_curve(y_test, best_result['y_pred_proba'], best_result['auc'], best_result['method'])
+    # Plot combined ROC-AUC for each view size ratio
+    for ratio in view_size_ratios:
+        plot_combined_roc_auc(results_df, y_test, ratio)
 
-    print("\nBest Method:", best_result['method'])
-    print("Best Result:", best_result)
+    # Visualize metrics
+    visualize_metrics(results_df)
 
+    print("\nAnalysis complete. Plots have been generated.")
 
 if __name__ == "__main__":
     main()

@@ -6,12 +6,12 @@
 4. Explain AI models in a scientific manner which should be convincable to non-technical people.
 5. Implement models with Semi-Supervised Learning.
 ## Preview
-Comparing a Pipeline of 6 classifiers on 2 datasets
+**Comparing a Pipeline of 6 classifiers on 2 datasets**
 ![alt text](AUC_diff_choc.png)
 ![alt text](AUC_diff_mush.png)
-Explainable AI
+**Explainable AI**
 ![alt text](XAI.png)
-Semi-Supervised Learning
+**Semi-Supervised Learning**
 ![alt text](semi-supervised-learning-comparison.png)
 # Dataset: Drug Consumption Analysis Dataset
 The dataset can be found at this link: https://archive.ics.uci.edu/dataset/373/drug+consumption+quantified.

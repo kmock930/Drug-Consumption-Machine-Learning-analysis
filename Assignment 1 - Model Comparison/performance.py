@@ -103,7 +103,7 @@ def evalPrecision(y_pred, y_test):
     try:
         return tp / predPos;
     except ZeroDivisionError:
-        return 0;
+        return 0.0;
 
 def evalRecall(y_pred, y_test):
     tp = evalTP(y_pred, y_test, 1);
@@ -112,7 +112,7 @@ def evalRecall(y_pred, y_test):
     try:
         return tp / actualPos;
     except ZeroDivisionError:
-        return 0;
+        return 0.0;
 
 def evalF1Score(y_pred, y_test):
     precision = evalPrecision(y_pred, y_test);
@@ -120,7 +120,7 @@ def evalF1Score(y_pred, y_test):
     try:
         return 2 * (precision * recall) / (precision + recall);
     except ZeroDivisionError:
-        return 0;
+        return 0.0;
 
 '''
 @summary Function that displays the prediction performance in a well-formatted confusion matrix

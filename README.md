@@ -27,9 +27,9 @@ The dataset can be found at this link: https://archive.ics.uci.edu/dataset/373/d
 - Explain whether certain classifiers make trustable predictions, with the calculation of SHAP values and some visualization plots.
 - Prepared labelled and unlabelled data, Implemented and Compared different semi-supervised learning algorithms based on the gradient boosting classifier from assignment 1.
 # Project Structure
-- You should expect a report in `.pdf` format at the root level.
+- You should expect some reports in `.pdf` format at the root level.
 - Please expand the folder at the root level to view codes.
-- This project branches out the analysis into 2 notebooks:
+- This project branches out the analysis into 9 notebooks:
   1. Modelling - please check the file `CSI5155 Assignment 1 Modelling Part- Kelvin Mock 300453668.ipynb`
   2. Evaluation - please check the file `CSI5155 Assignment 1 Evaluation Part - Kelvin Mock 300453668.ipynb`
   3. Calculation of SHAP Values - please check the file `CSI5155 Assignment 2 - Kelvin Mock 300453668.ipynb`

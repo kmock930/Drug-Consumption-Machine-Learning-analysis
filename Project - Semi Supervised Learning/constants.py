@@ -15,6 +15,7 @@ MODEL_SELFTRAIN_FILENAME = "mushrooms_model_Gradient_Boosting_selftrained.pkl";
 MODEL_COTRAIN_FILENAME = "mushrooms_model_Gradient_Boosting_cotrained.pkl";
 MODEL_COTRAIN_1_FILENAME = "mushrooms_model_Gradient_Boosting_cotrained_1.pkl";
 MODEL_COTRAIN_2_FILENAME = "mushrooms_model_Gradient_Boosting_cotrained_2.pkl";
+MODEL_SEMIBOOST_FILENAME = "mushrooms_model_SemiBoost.pkl";
 MODEL_DIR = "model";
 
 # data re-used
@@ -45,5 +46,10 @@ LABELLED_PORTION = 0.2;
 
 # co training feature split
 CO_TRAINING_FEATURE_SPLIT = 0.5;
+
+# Semi Boost parameters
+N_NEIGHBORS = 5;
+N_ESTIMATORS = 100;
+LEARNING_RATE = 0.1;
 
 RANDOM_STATE = 42;

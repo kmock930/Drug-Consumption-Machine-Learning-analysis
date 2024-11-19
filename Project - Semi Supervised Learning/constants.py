@@ -1,3 +1,5 @@
+from scipy.stats import randint, uniform;
+
 # directories
 ASM1_DIR = "Assignment 1 - Model Comparison";
 ASM2_DIR = "Assignment 2 - Explainable AI";
@@ -16,6 +18,7 @@ MODEL_COTRAIN_FILENAME = "mushrooms_model_Gradient_Boosting_cotrained.pkl";
 MODEL_COTRAIN_1_FILENAME = "mushrooms_model_Gradient_Boosting_cotrained_1.pkl";
 MODEL_COTRAIN_2_FILENAME = "mushrooms_model_Gradient_Boosting_cotrained_2.pkl";
 MODEL_SEMIBOOST_FILENAME = "mushrooms_model_SemiBoost.pkl";
+MODEL_LABELSPREAD_FILENAME = "mushrooms_model_LabelSpreading.pkl";
 MODEL_DIR = "model";
 
 # data re-used
@@ -38,6 +41,7 @@ Y_TRAIN_UNLABELLED_FILENAME = "mushrooms_train-set_labels_unlabelled.pkl";
 Y_TRAIN_PSEUDO_FILENAME = "mushrooms_train-set_samples_pseudo.pkl";
 # co-training data
 CO_TRAINING_BEST_FEATURE_SPLIT_RESULTS_FILENAME = "mushrooms_cotraining_best_feature_split_results.pkl";
+# 
 # columns file
 COLUMNS_FILENAME = "mushrooms_columns.pkl";
 
@@ -51,5 +55,17 @@ CO_TRAINING_FEATURE_SPLIT = 0.5;
 N_NEIGHBORS = 5;
 N_ESTIMATORS = 100;
 LEARNING_RATE = 0.1;
+
+# label spreading parameters
+KERNEL = 'rbf';
+GAMMA = 20;
+MAX_ITER = 30;
+LABEL_SPREAD_PARAM_DIST = {
+    'alpha': uniform(0.01, 0.99),
+    'max_iter': randint(100, 1000)
+};
+# Label spreading pipeline
+VERBOSE = 2;
+N_ITER = 100;
 
 RANDOM_STATE = 42;

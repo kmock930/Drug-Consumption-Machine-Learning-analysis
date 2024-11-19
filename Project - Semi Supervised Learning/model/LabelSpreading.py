@@ -9,7 +9,22 @@ import seaborn as sns
 import pickle
 import os
 from joblib import dump
+from sklearn.model_selection import RandomizedSearchCV;
+from imblearn.pipeline import Pipeline;
+import constants;
+from sklearn.base import BaseEstimator, TransformerMixin
 
+# Define a custom transformer to use the predictions from the first model as features for the second model
+class ProbabilitiesTransformer(BaseEstimator, TransformerMixin):
+    def __init__(self, model):
+        self.model = model
+
+    def fit(self, X, y=None):
+        self.model.fit(X, y)
+        return self
+
+    def transform(self, X):
+        return self.model.predict_proba(X)
 
 def load_split_data_pickle(directory='split_data_pickle'):
     """
@@ -39,54 +54,52 @@ def save_model(model, directory='models', filename='label_spreading_model.joblib
     print(f"Model saved to '{model_path}'")
 
 
-def build_label_spreading_model(X_train, X_test, y_train, y_test):
+def build_label_spreading_model(origModel):
     """
     Builds and evaluates a Label Spreading model.
     """
     # Initialize Label Spreading model
-    label_spread = LabelSpreading(kernel='rbf', gamma=20, max_iter=30)
+    labelSpread = LabelSpreading(
+        kernel=constants.KERNEL, 
+        gamma=constants.GAMMA, 
+        max_iter=constants.MAX_ITER
+    )
 
-    # Fit the model
-    print("\nTraining Label Spreading Classifier...")
-    label_spread.fit(X_train, y_train)
+    # Apply Parameter tuning to label spreading
+    labelSpread = RandomizedSearchCV(
+        estimator=labelSpread,
+        param_distributions=constants.LABEL_SPREAD_PARAM_DIST,
+        n_iter=100,
+        random_state=constants.RANDOM_STATE
+    )
 
+    # Create the custom transformer with the tuned Gradient Boosting model
+    prob_transformer = ProbabilitiesTransformer(origModel.best_estimator_)
+
+    # Create a pipeline with the original model and Label Spreading
+    pipeline = Pipeline([
+        ("original model", prob_transformer),
+        ('label_spread', labelSpread)
+    ])
+    
     # Save the model
-    save_model(label_spread, directory='models', filename='label_spreading_model.joblib')
+    save_model(pipeline, directory=constants.MODEL_DIR, filename=constants.MODEL_LABELSPREAD_FILENAME)
 
-    # Predictions
-    y_pred = label_spread.predict(X_test)
-    y_pred_proba = label_spread.predict_proba(X_test)[:, 1]
+    return pipeline;
 
-    # Evaluation Metrics
-    accuracy = accuracy_score(y_test, y_pred)
-    auc = roc_auc_score(y_test, y_pred_proba)
-    print(f"Label Spreading Test Accuracy: {accuracy:.4f}")
-    print(f"Label Spreading AUC-ROC Score: {auc:.4f}")
-    print("\nClassification Report:")
-    print(classification_report(y_test, y_pred))
+def train(model: Pipeline | LabelSpreading | RandomizedSearchCV, X_train, y_train):
+    """
+    Trains the Label Spreading model.
+    """
+    model.fit(X_train, y_train)
+    save_model(model, directory=constants.MODEL_DIR, filename=constants.MODEL_LABELSPREAD_FILENAME)
+    return model;
 
-    # Confusion Matrix
-    conf_matrix = confusion_matrix(y_test, y_pred)
-    plt.figure(figsize=(6, 4))
-    sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Purples',
-                xticklabels=['Class 0', 'Class 1'],
-                yticklabels=['Class 0', 'Class 1'])
-    plt.ylabel('Actual')
-    plt.xlabel('Predicted')
-    plt.title('Label Spreading Confusion Matrix')
-    plt.show()
-
-    # ROC Curve
-    fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
-    plt.figure(figsize=(6, 4))
-    plt.plot(fpr, tpr, color='purple', lw=2, label=f'ROC curve (AUC = {auc:.2f})')
-    plt.plot([0, 1], [0, 1], color='gray', lw=2, linestyle='--')
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.title('Label Spreading ROC Curve')
-    plt.legend(loc="lower right")
-    plt.show()
-
+def predict(model: Pipeline | LabelSpreading | RandomizedSearchCV, X_test):
+    """
+    Predicts using the Label Spreading model.
+    """
+    return model.predict(X_test);
 
 def main():
     # Load data

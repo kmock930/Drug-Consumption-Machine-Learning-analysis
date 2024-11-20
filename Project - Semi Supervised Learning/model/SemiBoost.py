@@ -1,6 +1,5 @@
 from sklearn.ensemble import AdaBoostClassifier;
 from sklearn.semi_supervised import SelfTrainingClassifier
-from sklearn.model_selection import RandomizedSearchCV
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score, classification_report, roc_auc_score, confusion_matrix, roc_curve
 import matplotlib.pyplot as plt
@@ -10,20 +9,6 @@ import os
 from joblib import dump
 import numpy as np
 import constants
-from sklearn.base import BaseEstimator, TransformerMixin
-from imblearn.pipeline import Pipeline;
-
-# Define a custom transformer to use the predictions from the first model as features for the second model
-class ProbabilitiesTransformer(BaseEstimator, TransformerMixin):
-    def __init__(self, model):
-        self.model = model
-
-    def fit(self, X, y=None):
-        self.model.fit(X, y)
-        return self
-
-    def transform(self, X):
-        return self.model.predict_proba(X)
 
 def load_split_data_pickle(directory='split_data_pickle'):
     """

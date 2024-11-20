@@ -41,7 +41,6 @@ Y_TRAIN_UNLABELLED_FILENAME = "mushrooms_train-set_labels_unlabelled.pkl";
 Y_TRAIN_PSEUDO_FILENAME = "mushrooms_train-set_samples_pseudo.pkl";
 # co-training data
 CO_TRAINING_BEST_FEATURE_SPLIT_RESULTS_FILENAME = "mushrooms_cotraining_best_feature_split_results.pkl";
-# 
 # columns file
 COLUMNS_FILENAME = "mushrooms_columns.pkl";
 
@@ -52,9 +51,11 @@ LABELLED_PORTION = 0.2;
 CO_TRAINING_FEATURE_SPLIT = 0.5;
 
 # Semi Boost parameters
-N_NEIGHBORS = 5;
-N_ESTIMATORS = 100;
-LEARNING_RATE = 0.1;
+# ada boost parameters
+N_ESTIMATORS = 50;
+# self training parameters
+THRESHOLD = 0.8;
+MAX_ITER = 10;
 
 # label spreading parameters
 KERNEL = 'rbf';

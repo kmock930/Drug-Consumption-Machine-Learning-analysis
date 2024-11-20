@@ -1,5 +1,6 @@
-from sklearn.ensemble import AdaBoostClassifier, GradientBoostingClassifier
+from sklearn.ensemble import AdaBoostClassifier;
 from sklearn.semi_supervised import SelfTrainingClassifier
+from sklearn.model_selection import RandomizedSearchCV
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score, classification_report, roc_auc_score, confusion_matrix, roc_curve
 import matplotlib.pyplot as plt
@@ -7,6 +8,22 @@ import seaborn as sns
 import pickle
 import os
 from joblib import dump
+import numpy as np
+import constants
+from sklearn.base import BaseEstimator, TransformerMixin
+from imblearn.pipeline import Pipeline;
+
+# Define a custom transformer to use the predictions from the first model as features for the second model
+class ProbabilitiesTransformer(BaseEstimator, TransformerMixin):
+    def __init__(self, model):
+        self.model = model
+
+    def fit(self, X, y=None):
+        self.model.fit(X, y)
+        return self
+
+    def transform(self, X):
+        return self.model.predict_proba(X)
 
 def load_split_data_pickle(directory='split_data_pickle'):
     """
@@ -36,30 +53,67 @@ def save_model(model, directory='models', filename='semi_boost_model.joblib'):
     print(f"Model saved to '{model_path}'")
 
 
-def build_semi_boost_model(X_train, X_test, y_train, y_test):
+def build_semi_boost_model(baseModel=None):
     """
     Builds and evaluates a SemiBoost-like model using AdaBoost with self-training.
     """
     # Initialize base estimator as a weak learner
-    base_estimator = DecisionTreeClassifier(max_depth=1, random_state=42)
+    defaultLearner = DecisionTreeClassifier(
+        max_depth=1, 
+        random_state=constants.RANDOM_STATE
+    );
+    base_estimator = baseModel if baseModel != None else defaultLearner;
 
     # Initialize AdaBoost Classifier with the weak learner
-    ada_clf = AdaBoostClassifier(estimator=base_estimator, n_estimators=50, random_state=42)
+    ada_clf = AdaBoostClassifier(
+        base_estimator=base_estimator, 
+        n_estimators=constants.N_ESTIMATORS, 
+        random_state=constants.RANDOM_STATE
+    );
 
     # Initialize Self-Training Classifier with AdaBoost as base
-    self_training_clf = SelfTrainingClassifier(base_estimator=ada_clf, threshold=0.8, max_iter=10, verbose=True)
+    self_training_clf = SelfTrainingClassifier(
+        base_estimator=ada_clf, 
+        threshold=constants.THRESHOLD, 
+        max_iter=constants.MAX_ITER, 
+        verbose=True
+    );
 
+    save_model(
+        model=self_training_clf, 
+        directory=constants.MODEL_DIR, 
+        filename=constants.MODEL_SEMIBOOST_FILENAME
+    );
+
+    return self_training_clf;
+
+def train(model, X_train: np.ndarray, y_train: np.ndarray):
+    '''
+    Train the model
+    '''
     # Fit the model
     print("\nTraining SemiBoost-like Classifier...")
-    self_training_clf.fit(X_train, y_train)
+    model.fit(X_train, y_train)
 
     # Save the model
-    save_model(self_training_clf, directory='models', filename='semi_boost_model.joblib')
+    save_model(model, directory='models', filename=constants.MODEL_SEMIBOOST_FILENAME)
 
+    return model
+
+def predict(X_test: np.ndarray, y_test: np.ndarray, model):
+    '''
+    Predict the model
+    '''
     # Predictions
-    y_pred = self_training_clf.predict(X_test)
-    y_pred_proba = self_training_clf.predict_proba(X_test)[:, 1]
+    y_pred = model.predict(X_test)
+    y_pred_proba = model.predict_proba(X_test)[:, 1]
 
+    return y_pred, y_pred_proba;
+
+def evaluate(y_test: np.ndarray, y_pred: np.ndarray, y_pred_proba: np.ndarray):
+    '''
+    Evaluate the model
+    '''
     # Evaluation Metrics
     accuracy = accuracy_score(y_test, y_pred)
     auc = roc_auc_score(y_test, y_pred_proba)
@@ -89,24 +143,3 @@ def build_semi_boost_model(X_train, X_test, y_train, y_test):
     plt.title('SemiBoost ROC Curve')
     plt.legend(loc="lower right")
     plt.show()
-
-
-def main():
-    # Load data
-    X_train, X_test, y_train, y_test, scaler = load_split_data_pickle()
-
-    # For SemiBoost-like approach, assume some unlabeled data
-    import numpy as np
-    unlabeled_fraction = 0.1
-    n_unlabeled = int(len(y_train) * unlabeled_fraction)
-    np.random.seed(42)
-    unlabeled_indices = np.random.choice(y_train.index, n_unlabeled, replace=False)
-    y_train_unlabeled = y_train.copy()
-    y_train_unlabeled.loc[unlabeled_indices] = -1  # Mark as unlabeled
-
-    # Build and evaluate the SemiBoost-like model
-    build_semi_boost_model(X_train, X_test, y_train_unlabeled, y_test)
-
-
-if __name__ == "__main__":
-    main()

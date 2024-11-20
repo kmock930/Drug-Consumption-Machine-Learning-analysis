@@ -56,6 +56,18 @@ N_ESTIMATORS = 50;
 # self training parameters
 THRESHOLD = 0.8;
 MAX_ITER = 10;
+# random search for semi boost (ada boost)
+ADA_BOOST_PARAM_DIST = {
+    'n_estimators': randint(50, 200),
+    'learning_rate': uniform(0.01, 0.1)
+}
+# random search for semi boost (self training classifier)
+SELF_TRAINING_PARAM_DIST = {
+    #'n_estimators': randint(50, 200),
+    #'learning_rate': uniform(0.01, 0.1),
+    'threshold': uniform(0.5, 0.9),
+    'max_iter': randint(5, 20)
+}
 
 # label spreading parameters
 KERNEL = 'rbf';

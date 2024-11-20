@@ -1,4 +1,5 @@
 from sklearn.ensemble import AdaBoostClassifier;
+from sklearn.model_selection import RandomizedSearchCV
 from sklearn.semi_supervised import SelfTrainingClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score, classification_report, roc_auc_score, confusion_matrix, roc_curve

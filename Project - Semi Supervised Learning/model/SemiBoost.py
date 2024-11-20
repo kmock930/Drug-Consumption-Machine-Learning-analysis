@@ -1,74 +1,112 @@
-import numpy as np;
-from sklearn.base import BaseEstimator, ClassifierMixin;
-from sklearn.metrics import pairwise_distances;
-from sklearn.utils import check_X_y, check_array;
+from sklearn.ensemble import AdaBoostClassifier, GradientBoostingClassifier
+from sklearn.semi_supervised import SelfTrainingClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score, classification_report, roc_auc_score, confusion_matrix, roc_curve
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pickle
+import os
+from joblib import dump
 
-class SemiBoost(BaseEstimator, ClassifierMixin):
-    def __init__(self, base_estimator=None, n_neighbors=5, n_estimators=100, max_iter=50, learning_rate=1.0, random_state=42):
-        self.base_estimator = base_estimator;
-        self.n_neighbors = n_neighbors;
-        self.n_estimators = n_estimators;
-        self.max_iter = max_iter;
-        self.learning_rate = learning_rate;
-        self.random_state = random_state;
+def load_split_data_pickle(directory='split_data_pickle'):
+    """
+    Loads the split and processed data saved as pickle files.
+    """
+    filenames = ['X_train.pkl', 'X_test.pkl', 'y_train.pkl', 'y_test.pkl', 'scaler.pkl']
+    loaded_data = {}
+    for filename in filenames:
+        file_path = os.path.join(directory, filename)
+        if os.path.exists(file_path):
+            with open(file_path, 'rb') as file:
+                loaded_data[filename] = pickle.load(file)
+            print(f"Loaded '{filename}' from '{directory}/'")
+        else:
+            raise FileNotFoundError(f"'{filename}' not found in '{directory}/'")
+    return loaded_data['X_train.pkl'], loaded_data['X_test.pkl'], loaded_data['y_train.pkl'], loaded_data['y_test.pkl'], \
+           loaded_data['scaler.pkl']
 
-    def train(self, X, y):
-        X, y = check_X_y(X, y);
-        
-        self.classes_ = np.unique(y);
-        self.X_ = X;
-        self.y_ = y;
 
-        # Initialize weights
-        self.weights_ = np.ones(len(y)) / len(y);
+def save_model(model, directory='models', filename='semi_boost_model.joblib'):
+    """
+    Saves the trained model using Joblib.
+    """
+    os.makedirs(directory, exist_ok=True)
+    model_path = os.path.join(directory, filename)
+    dump(model, model_path)
+    print(f"Model saved to '{model_path}'")
 
-        for iteration in range(self.max_iter):
-            # Compute pairwise distances
-            distances = pairwise_distances(X);
-            np.fill_diagonal(distances, np.inf);
-            np.nan_to_num(distances, posinf=1e10, neginf=-1e10, copy=False);
 
-            # Find nearest neighbors
-            neighbors = np.argsort(distances, axis=1)[:, :self.n_neighbors];
+def build_semi_boost_model(X_train, X_test, y_train, y_test):
+    """
+    Builds and evaluates a SemiBoost-like model using AdaBoost with self-training.
+    """
+    # Initialize base estimator as a weak learner
+    base_estimator = DecisionTreeClassifier(max_depth=1, random_state=42)
 
-            # Compute similarity matrix
-            S = np.exp(-distances ** 2 / (2. * np.var(distances)));
+    # Initialize AdaBoost Classifier with the weak learner
+    ada_clf = AdaBoostClassifier(estimator=base_estimator, n_estimators=50, random_state=42)
 
-            # Update weights
-            for i in range(len(y)):
-                for j in neighbors[i]:
-                    if y[i] == y[j]:
-                        self.weights_[i] *= np.exp(-self.learning_rate * S[i, j]);
-                    else:
-                        self.weights_[i] *= np.exp(self.learning_rate * S[i, j]);
+    # Initialize Self-Training Classifier with AdaBoost as base
+    self_training_clf = SelfTrainingClassifier(base_estimator=ada_clf, threshold=0.8, max_iter=10, verbose=True)
 
-            # Normalize weights
-            self.weights_ /= np.sum(self.weights_);
-        
-        return self;
+    # Fit the model
+    print("\nTraining SemiBoost-like Classifier...")
+    self_training_clf.fit(X_train, y_train)
 
-    def predict(self, X):
-        X = check_array(X);
-        distances = pairwise_distances(X, self.X_);
-        predictions = [];
+    # Save the model
+    save_model(self_training_clf, directory='models', filename='semi_boost_model.joblib')
 
-        for i in range(len(X)):
-            weighted_votes = np.zeros(len(self.classes_));
-            for j in range(len(self.X_)):
-                weighted_votes[self.y_[j]] += self.weights_[j] / distances[i, j];
-            predictions.append(self.classes_[np.argmax(weighted_votes)]);
+    # Predictions
+    y_pred = self_training_clf.predict(X_test)
+    y_pred_proba = self_training_clf.predict_proba(X_test)[:, 1]
 
-        return np.array(predictions);
+    # Evaluation Metrics
+    accuracy = accuracy_score(y_test, y_pred)
+    auc = roc_auc_score(y_test, y_pred_proba)
+    print(f"SemiBoost Test Accuracy: {accuracy:.4f}")
+    print(f"SemiBoost AUC-ROC Score: {auc:.4f}")
+    print("\nClassification Report:")
+    print(classification_report(y_test, y_pred))
 
-    def predict_proba(self, X):
-        X = check_array(X);
-        distances = pairwise_distances(X, self.X_);
-        proba = [];
+    # Confusion Matrix
+    conf_matrix = confusion_matrix(y_test, y_pred)
+    plt.figure(figsize=(6, 4))
+    sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Greens',
+                xticklabels=['Class 0', 'Class 1'],
+                yticklabels=['Class 0', 'Class 1'])
+    plt.ylabel('Actual')
+    plt.xlabel('Predicted')
+    plt.title('SemiBoost Confusion Matrix')
+    plt.show()
 
-        for i in range(len(X)):
-            weighted_votes = np.zeros(len(self.classes_));
-            for j in range(len(self.X_)):
-                weighted_votes[self.y_[j]] += self.weights_[j] / distances[i, j];
-            proba.append(weighted_votes / np.sum(weighted_votes));
+    # ROC Curve
+    fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
+    plt.figure(figsize=(6, 4))
+    plt.plot(fpr, tpr, color='darkgreen', lw=2, label=f'ROC curve (AUC = {auc:.2f})')
+    plt.plot([0, 1], [0, 1], color='gray', lw=2, linestyle='--')
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('SemiBoost ROC Curve')
+    plt.legend(loc="lower right")
+    plt.show()
 
-        return np.array(proba);
+
+def main():
+    # Load data
+    X_train, X_test, y_train, y_test, scaler = load_split_data_pickle()
+
+    # For SemiBoost-like approach, assume some unlabeled data
+    import numpy as np
+    unlabeled_fraction = 0.1
+    n_unlabeled = int(len(y_train) * unlabeled_fraction)
+    np.random.seed(42)
+    unlabeled_indices = np.random.choice(y_train.index, n_unlabeled, replace=False)
+    y_train_unlabeled = y_train.copy()
+    y_train_unlabeled.loc[unlabeled_indices] = -1  # Mark as unlabeled
+
+    # Build and evaluate the SemiBoost-like model
+    build_semi_boost_model(X_train, X_test, y_train_unlabeled, y_test)
+
+
+if __name__ == "__main__":
+    main()

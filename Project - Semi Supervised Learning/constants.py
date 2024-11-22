@@ -9,6 +9,7 @@ MUSH_DIR = "mushrooms";
 POSTTRAINED_DIR = "posttrained";
 TRAIN_DIR = "Training Set";
 TEST_DIR = "Test Set";
+PRED_DIR = "Predictions";
 COLUMNS_DIR = "Columns";
 
 # model re-used
@@ -20,6 +21,13 @@ MODEL_COTRAIN_2_FILENAME = "mushrooms_model_Gradient_Boosting_cotrained_2.pkl";
 MODEL_SEMIBOOST_FILENAME = "mushrooms_model_SemiBoost.pkl";
 MODEL_LABELSPREAD_FILENAME = "mushrooms_model_LabelSpreading.pkl";
 MODEL_DIR = "model";
+
+# Pred Proba
+Y_PRED_TEST_COTRAIN_FILENAME = "mushrooms_pred_proba_cotrained.pkl";
+Y_PRED_TEST_LABELSPREAD_FILENAME = "mushrooms_pred_proba_label_spreading.pkl";
+Y_PRED_TEST_SELFTRAIN_FILENAME = "mushrooms_pred_proba_self_trained.pkl";
+Y_PRED_TEST_BASELINE_FILENAME = "mushrooms_pred_proba_baseline.pkl";
+Y_PRED_TEST_SEMIBOOST_FILENAME = "mushrooms_pred_proba_semi_boost.pkl";
 
 # data re-used
 X_TRAIN_FILENAME = "mushrooms_train-set_samples.pkl";

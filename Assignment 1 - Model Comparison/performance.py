@@ -160,7 +160,7 @@ def evalPredictionNum(y_pred: np.ndarray, y_test: np.ndarray, truePred: bool = N
     else:
         return np.sum(evalArray == truePred)  # count of true or false predictions
 
-def plotROC(models: dict, X_test: np.ndarray, y_test: np.ndarray | list, dataset: str, feature_subsets: dict = None):
+def plotROC(models: dict, X_test: np.ndarray, y_test: np.ndarray | list, dataset: str, feature_subsets: dict = None, y_pred_proba: np.ndarray | list[np.ndarray] = None):
     plt.figure(figsize=(10, 8));
     # https://scikit-learn.org/1.0/modules/generated/sklearn.metrics.plot_roc_curve.html
     plt.title(f'Receiver Operating Characteristic (ROC) Curve for {dataset} dataset');
@@ -168,18 +168,24 @@ def plotROC(models: dict, X_test: np.ndarray, y_test: np.ndarray | list, dataset
     # Iterate through the models
     AUCs = [];
     if len(models) > 0:
+        modelInd: int = 0;
         for modelName, model in models.items():
             if feature_subsets and modelName in feature_subsets:
                 X_test_subset = X_test[:, feature_subsets[modelName]];
             else:
                 X_test_subset = X_test;
             
-            y_scores = getYScore(model, X_test_subset);
+            if (y_pred_proba is not None):
+                y_scores = y_pred_proba[modelInd];
+            else:
+                y_scores = getYScore(model, X_test_subset);
             
             fpr, tpr, _ = roc_curve(y_test, y_scores);
             auc = getAUC(y_test, y_scores);
             plt.plot(fpr, tpr, label=f'{modelName} (AUC = {auc:.2f})');
             AUCs.append(auc);
+    
+            modelInd += 1;
 
     plt.legend(loc='lower right');
     plt.plot([0, 1], [0, 1], 'r--');

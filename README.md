@@ -28,6 +28,7 @@ The dataset can be found at this link: https://archive.ics.uci.edu/dataset/373/d
 - Prepared labelled and unlabelled data, Implemented and Compared different semi-supervised learning algorithms based on the gradient boosting classifier from assignment 1.
 # Project Structure
 - You should expect some reports in `.pdf` format at the root level.
+- The report for the project is inside the project folder, with name: "Project - Semi Supervised Learning/KeycodeExplaination.pdf"
 - Please expand the folder at the root level to view codes.
 - This project branches out the analysis into 9 notebooks:
   1. Modelling - please check the file `CSI5155 Assignment 1 Modelling Part- Kelvin Mock 300453668.ipynb`
